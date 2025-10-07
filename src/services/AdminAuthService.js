@@ -1,4 +1,7 @@
 // Admin Authentication Service
+import secureStorage from './SecureStorage';
+import SecurityUtils from '../utils/SecurityUtils';
+
 class AdminAuthService {
   constructor() {
     this.adminCredentials = {
@@ -31,6 +34,15 @@ class AdminAuthService {
   // Admin login
   async login(username, password) {
     try {
+      // Input sanitization
+      username = SecurityUtils.sanitizeInput(username);
+      
+      // Rate limiting check
+      const rateLimit = SecurityUtils.rateLimit(`admin_login_${username}`, 5, 300000); // 5 attempts per 5 minutes
+      if (!rateLimit.allowed) {
+        throw new Error(`Too many login attempts. Try again in ${rateLimit.remainingTime} seconds.`);
+      }
+      
       // Check for account lockout
       const lockoutInfo = this.getLoginAttempts(username);
       if (lockoutInfo.isLocked) {
@@ -341,5 +353,5 @@ class AdminAuthService {
 }
 
 // Create and export a singleton instance
-const adminAuthService = new AdminAuthService();
-export default adminAuthService;
+const adminAuthServiceInstance = new AdminAuthService();
+export default adminAuthServiceInstance;

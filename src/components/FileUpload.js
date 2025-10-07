@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import SecurityUtils from '../utils/SecurityUtils';
 import './FileUpload.css';
 
 const FileUpload = ({ onFileSelect, isProcessing }) => {
@@ -40,13 +41,18 @@ const FileUpload = ({ onFileSelect, isProcessing }) => {
         size: file.size
       });
       
-      // Check if it's a valid media file
-      if (file.type.startsWith('video/') || file.type.startsWith('audio/') || file.type.startsWith('image/')) {
+      // Validate file using security utils
+      const validation = SecurityUtils.validateFile(file, {
+        maxSize: 500 * 1024 * 1024, // 500MB
+        allowedTypes: ['video/', 'audio/', 'image/']
+      });
+      
+      if (validation.isValid) {
         console.log('Valid media file, calling onFileSelect');
         onFileSelect(file);
       } else {
-        console.log('Invalid file type:', file.type);
-        alert('Please select a valid video, audio, or image file.');
+        console.log('File validation failed:', validation.errors);
+        alert(`File validation failed:\n${validation.errors.join('\n')}`);
       }
     }
   }, [onFileSelect]);
@@ -58,7 +64,18 @@ const FileUpload = ({ onFileSelect, isProcessing }) => {
     if (files.length > 0) {
       const file = files[0];
       console.log('File selected via input:', file);
-      onFileSelect(file);
+      
+      // Validate file using security utils
+      const validation = SecurityUtils.validateFile(file, {
+        maxSize: 500 * 1024 * 1024, // 500MB
+        allowedTypes: ['video/', 'audio/', 'image/']
+      });
+      
+      if (validation.isValid) {
+        onFileSelect(file);
+      } else {
+        alert(`File validation failed:\n${validation.errors.join('\n')}`);
+      }
     }
   }, [onFileSelect]);
 
