@@ -137,11 +137,24 @@ npm run deploy
 
 ### **Environment Variables**
 ```env
+# Admin Credentials (REQUIRED - Change these!)
+REACT_APP_ADMIN_USERNAME=your_admin_username
+REACT_APP_ADMIN_PASSWORD=your_secure_password
+REACT_APP_ADMIN_EMAIL=admin@yourdomain.com
+
+# Payment Integration
 REACT_APP_PAYPAL_CLIENT_ID=your_paypal_client_id
 REACT_APP_STRIPE_PUBLISHABLE_KEY=your_stripe_key
+
+# API Configuration
 REACT_APP_API_BASE_URL=your_api_endpoint
 REACT_APP_EMAIL_SERVICE_URL=your_email_service
 ```
+
+### **Security Setup**
+1. **Copy Environment File**: `cp .env.example .env`
+2. **Set Admin Credentials**: Update username/password in `.env`
+3. **Never commit .env**: File is gitignored for security
 
 ### **Payment Setup**
 1. Configure PayPal Developer Account
@@ -176,10 +189,16 @@ REACT_APP_EMAIL_SERVICE_URL=your_email_service
 - **Privacy First**: No file storage on external servers
 
 ### **Access Control**
-- **Admin Authentication**: Secure login system
+- **Admin Authentication**: Secure login system with configurable credentials
+- **Environment Variables**: Admin credentials configured via .env file
 - **Role-based Permissions**: Granular access control
 - **Session Management**: Secure user sessions
 - **Audit Logging**: Complete activity tracking
+
+### **Admin Setup**
+- **Secure Configuration**: Copy `.env.example` to `.env` and set secure credentials
+- **Hidden Access**: Admin panel accessible only via Ctrl + I keyboard shortcut
+- **No UI References**: Admin access completely hidden from user interface
 
 ---
 

@@ -185,21 +185,6 @@ const AdminLogin = ({ onLoginSuccess }) => {
               <li>Use strong passwords for security</li>
             </ul>
           </div>
-
-          <div className="default-credentials">
-            <h4>🔑 Default Credentials</h4>
-            <div className="credential-item">
-              <span className="credential-label">Username:</span>
-              <code>admin</code>
-            </div>
-            <div className="credential-item">
-              <span className="credential-label">Password:</span>
-              <code>nebula2025!</code>
-            </div>
-            <p className="credential-warning">
-              ⚠️ Change these credentials immediately in production!
-            </p>
-          </div>
         </div>
 
         <div className="admin-login-footer">

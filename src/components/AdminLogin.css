@@ -237,13 +237,11 @@
   margin-bottom: 2rem;
 }
 
-.security-info,
-.default-credentials {
+.security-info {
   margin-bottom: 2rem;
 }
 
-.security-info h4,
-.default-credentials h4 {
+.security-info h4 {
   color: #00d4ff;
   margin: 0 0 1rem 0;
   font-size: 1rem;
@@ -273,44 +271,6 @@
   position: absolute;
   left: 0;
   font-weight: bold;
-}
-
-.credential-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(42, 42, 42, 0.5);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.credential-label {
-  color: #ccc;
-  font-size: 0.875rem;
-  min-width: 80px;
-}
-
-.credential-item code {
-  background: rgba(0, 212, 255, 0.2);
-  color: #00d4ff;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.875rem;
-  border: 1px solid rgba(0, 212, 255, 0.3);
-}
-
-.credential-warning {
-  color: #ffa502;
-  font-size: 0.8rem;
-  margin: 1rem 0 0 0;
-  padding: 0.75rem;
-  background: rgba(255, 165, 0, 0.1);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 165, 0, 0.2);
-  line-height: 1.4;
 }
 
 .admin-login-footer {
@@ -365,16 +325,6 @@
     padding: 0.875rem 1.5rem;
     font-size: 0.95rem;
   }
-
-  .credential-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .credential-label {
-    min-width: auto;
-  }
 }
 
 @media (max-width: 480px) {
@@ -388,9 +338,5 @@
 
   .security-info li {
     font-size: 0.8rem;
-  }
-
-  .credential-warning {
-    font-size: 0.75rem;
   }
 }

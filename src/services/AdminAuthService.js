@@ -2,10 +2,9 @@
 class AdminAuthService {
   constructor() {
     this.adminCredentials = {
-      // Default admin credentials (should be changed in production)
-      username: 'admin',
-      password: 'nebula2025!',
-      email: 'admin@nebula.com',
+      username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
+      password: process.env.REACT_APP_ADMIN_PASSWORD || 'nebula2025!',
+      email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebula.com',
       role: 'super_admin',
       permissions: ['all'],
       subscriptionPlan: 'business',
