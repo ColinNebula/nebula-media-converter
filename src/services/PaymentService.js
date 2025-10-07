@@ -1,7 +1,7 @@
 // Payment Service for Nebula
 class PaymentService {
   constructor() {
-    this.apiEndpoint = process.env.REACT_APP_PAYMENT_API || 'https://api.nebula.com/payments';
+    this.apiEndpoint = process.env.REACT_APP_PAYMENT_API || process.env.REACT_APP_API_BASE_URL + '/payments' || 'https://api.nebula.com/payments';
     this.paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID || 'demo_paypal_client_id';
     this.stripePublishableKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo_key';
     

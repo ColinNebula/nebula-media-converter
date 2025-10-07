@@ -43,11 +43,11 @@ class EmailJSService {
       const templateParams = {
         to_email: userEmail,
         to_name: userName,
-        from_name: 'Nebula Media Converter',
-        subject: 'Welcome to Nebula Media Converter! 🌟',
+        from_name: process.env.REACT_APP_APP_NAME || 'Nebula Media Converter',
+        subject: `Welcome to ${process.env.REACT_APP_APP_NAME || 'Nebula Media Converter'}! 🌟`,
         message: `Hello ${userName}!
 
-Welcome to Nebula Media Converter - your new favorite tool for converting media files!
+Welcome to ${process.env.REACT_APP_APP_NAME || 'Nebula Media Converter'} - your new favorite tool for converting media files!
 
 🎥 Features you can enjoy:
 • Convert videos, audio, and images
@@ -71,15 +71,15 @@ Need help? Just reply to this email and we'll be happy to assist!
 
 Best regards,
 The Nebula Team
-Colin Nebula - Nebula3D Dev Company
+${process.env.REACT_APP_DEVELOPER_NAME || 'Colin Nebula'} - ${process.env.REACT_APP_COMPANY_NAME || 'Nebula3D Dev Company'}
 
 ---
-Visit us: https://colinnebula.github.io/nebula-media-converter/
-Support: admin@nebuladev.com`,
-        app_name: 'Nebula Media Converter',
-        company_name: 'Nebula3D Dev Company',
-        support_email: 'admin@nebuladev.com',
-        app_url: 'https://colinnebula.github.io/nebula-media-converter/'
+Visit us: ${process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/'}
+Support: ${process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com'}`,
+        app_name: process.env.REACT_APP_APP_NAME || 'Nebula Media Converter',
+        company_name: process.env.REACT_APP_COMPANY_NAME || 'Nebula3D Dev Company',
+        support_email: process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com',
+        app_url: process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/'
       };
 
       const result = await emailjs.send(
@@ -118,7 +118,7 @@ Support: admin@nebuladev.com`,
       const templateParams = {
         to_email: userEmail,
         to_name: 'User',
-        from_name: 'Nebula Media Converter',
+        from_name: process.env.REACT_APP_APP_NAME || 'Nebula Media Converter',
         subject: '✅ Your file conversion is complete!',
         message: `Great news! Your file conversion is ready.
 
@@ -129,14 +129,14 @@ Support: admin@nebuladev.com`,
 
 🎉 Your converted file should have downloaded automatically. If not, please return to the app and download it from the results page.
 
-Thanks for using Nebula Media Converter!
+Thanks for using ${process.env.REACT_APP_APP_NAME || 'Nebula Media Converter'}!
 
 Best regards,
 The Nebula Team`,
         file_name: fileName,
         output_format: outputFormat,
         conversion_time: new Date().toLocaleString(),
-        app_url: 'https://colinnebula.github.io/nebula-media-converter/'
+        app_url: process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/'
       };
 
       const result = await emailjs.send(
@@ -174,12 +174,12 @@ The Nebula Team`,
       const templateParams = {
         to_email: userEmail,
         to_name: 'Valued User',
-        from_name: 'Nebula Media Converter',
+        from_name: process.env.REACT_APP_APP_NAME || 'Nebula Media Converter',
         subject: subject,
         message: content,
-        app_name: 'Nebula Media Converter',
-        unsubscribe_url: 'https://colinnebula.github.io/nebula-media-converter/',
-        app_url: 'https://colinnebula.github.io/nebula-media-converter/'
+        app_name: process.env.REACT_APP_APP_NAME || 'Nebula Media Converter',
+        unsubscribe_url: process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/',
+        app_url: process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/'
       };
 
       const result = await emailjs.send(
@@ -215,7 +215,7 @@ The Nebula Team`,
 
     try {
       const templateParams = {
-        to_email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebuladev.com',
+        to_email: process.env.REACT_APP_ADMIN_EMAIL || process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com',
         to_name: 'Admin',
         from_name: fromName,
         from_email: fromEmail,

@@ -188,8 +188,8 @@ const ContactForm = ({ isOpen, onClose }) => {
 
           <div className="contact-info">
             <h4>Other ways to reach us:</h4>
-            <p>📧 Email: admin@nebuladev.com</p>
-            <p>🌐 Website: https://colinnebula.github.io/nebula-media-converter/</p>
+            <p>📧 Email: {process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com'}</p>
+            <p>🌐 Website: {process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/'}</p>
             <p>⏰ Response time: Usually within 24 hours</p>
           </div>
         </div>

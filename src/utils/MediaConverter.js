@@ -15,8 +15,8 @@ class MediaConverter {
       
       // Load FFmpeg with CDN URLs - try multiple sources
       const baseURLs = [
-        'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
-        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd'
+        process.env.REACT_APP_FFMPEG_CDN_PRIMARY || 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
+        process.env.REACT_APP_FFMPEG_CDN_FALLBACK || 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd'
       ];
 
       let loadSuccess = false;

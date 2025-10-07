@@ -3,7 +3,7 @@ import emailJSService from './EmailJSService';
 
 class EmailService {
   constructor() {
-    this.apiEndpoint = process.env.REACT_APP_EMAIL_API || 'https://api.nebula.com/email';
+    this.apiEndpoint = process.env.REACT_APP_EMAIL_SERVICE_URL || process.env.REACT_APP_API_BASE_URL + '/email' || 'https://api.nebula.com/email';
     this.emailProvider = process.env.REACT_APP_EMAIL_PROVIDER || 'emailjs'; // emailjs, sendgrid, mailgun, ses
     this.emailJSService = emailJSService;
     this.templates = {

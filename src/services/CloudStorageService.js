@@ -9,7 +9,7 @@ class CloudStorageService {
       bucket: config.bucket || 'nebula-media-files',
       tempBucket: config.tempBucket || 'nebula-temp-files',
       cdn: config.cdn || 'https://cdn.nebula.com',
-      apiEndpoint: config.apiEndpoint || 'https://api.nebula.com',
+      apiEndpoint: config.apiEndpoint || process.env.REACT_APP_API_BASE_URL || 'https://api.nebula.com',
       maxFileSize: config.maxFileSize || 500 * 1024 * 1024, // 500MB default
       retentionPeriod: config.retentionPeriod || 7 * 24 * 60 * 60 * 1000, // 7 days
       ...config

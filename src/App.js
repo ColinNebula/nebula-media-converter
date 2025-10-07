@@ -18,6 +18,7 @@ import CloudStorageService from './services/CloudStorageService';
 import adminAuthService from './services/AdminAuthService';
 import emailJSService from './services/EmailJSService';
 import ContactForm from './components/ContactForm';
+import configValidator from './utils/ConfigValidator';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +44,7 @@ function App() {
     tempBucket: 'nebula-temp-files',
     maxFileSize: isPremium ? 5 * 1024 * 1024 * 1024 : 500 * 1024 * 1024, // 5GB premium, 500MB free
     retentionPeriod: 7 * 24 * 60 * 60 * 1000, // 7 days
-    apiEndpoint: process.env.REACT_APP_API_ENDPOINT || 'https://api.nebula.com'
+    apiEndpoint: process.env.REACT_APP_API_BASE_URL || 'https://api.nebula.com'
   }));
   const [storageStats, setStorageStats] = useState({ used: 0, limit: 0 });
 
@@ -141,6 +142,9 @@ function App() {
 
   // Splash screen effect
   useEffect(() => {
+    // Validate environment configuration on startup
+    configValidator.logConfigStatus();
+    
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, isAdminMode ? 500 : 3000); // Shorter splash for admin mode
