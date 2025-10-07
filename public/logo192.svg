@@ -1,0 +1,83 @@
+<svg width="192" height="192" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient definitions -->
+    <radialGradient id="nebulaGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:0.6" />
+    </radialGradient>
+    
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f5ff;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#ff6b6b;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle (nebula) -->
+  <circle cx="100" cy="100" r="90" fill="url(#nebulaGradient)" opacity="0.3"/>
+  
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="80" fill="none" stroke="url(#nebulaGradient)" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Central "N" for Nebula -->
+  <g transform="translate(100, 100)" filter="url(#glow)">
+    <!-- Letter N -->
+    <path d="M-25,-30 L-25,30 M-25,-30 L25,30 M25,-30 L25,30" 
+          stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none"/>
+  </g>
+  
+  <!-- Audio wave elements -->
+  <g transform="translate(100, 100)" opacity="0.7">
+    <!-- Left audio waves -->
+    <path d="M-50,-10 Q-45,-15 -40,-10 Q-35,-5 -30,-10" 
+          stroke="url(#waveGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M-50,0 Q-45,-8 -40,0 Q-35,8 -30,0" 
+          stroke="url(#waveGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M-50,10 Q-45,5 -40,10 Q-35,15 -30,10" 
+          stroke="url(#waveGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    
+    <!-- Right audio waves -->
+    <path d="M30,-10 Q35,-15 40,-10 Q45,-5 50,-10" 
+          stroke="url(#waveGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M30,0 Q35,-8 40,0 Q45,8 50,0" 
+          stroke="url(#waveGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M30,10 Q35,5 40,10 Q45,15 50,10" 
+          stroke="url(#waveGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Video/media elements (corner triangles) -->
+  <g opacity="0.6">
+    <!-- Top left play button -->
+    <polygon points="40,40 40,60 55,50" fill="#00f5ff"/>
+    
+    <!-- Top right video icon -->
+    <rect x="145" y="40" width="15" height="10" rx="2" fill="#ff6b6b"/>
+    <circle cx="150" cy="45" r="2" fill="#ffffff"/>
+    
+    <!-- Bottom left music note -->
+    <circle cx="45" cy="155" r="4" fill="#4ecdc4"/>
+    <path d="M49,155 L49,140 Q52,138 55,140 L55,150" 
+          stroke="#4ecdc4" stroke-width="2" fill="none"/>
+    
+    <!-- Bottom right conversion arrows -->
+    <path d="M145,150 L155,150 M150,145 L155,150 L150,155" 
+          stroke="#f093fb" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Animated particles/stars -->
+  <g opacity="0.8">
+    <circle cx="60" cy="70" r="2" fill="#ffffff"/>
+    <circle cx="140" cy="80" r="1.5" fill="#00f5ff"/>
+    <circle cx="70" cy="140" r="1" fill="#ff6b6b"/>
+    <circle cx="130" cy="130" r="1.5" fill="#4ecdc4"/>
+  </g>
+</svg>

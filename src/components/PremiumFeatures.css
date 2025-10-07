@@ -1,0 +1,470 @@
+.premium-features {
+  position: relative;
+}
+
+/* Premium Banner */
+.premium-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.banner-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+}
+
+.banner-content p {
+  margin: 0 0 1rem 0;
+  opacity: 0.9;
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+}
+
+.banner-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.upgrade-btn {
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  white-space: nowrap;
+}
+
+.upgrade-btn.primary {
+  background: white;
+  color: #667eea;
+}
+
+.upgrade-btn.secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.upgrade-btn:hover {
+  transform: translateY(-2px);
+}
+
+.upgrade-btn.primary:hover {
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.upgrade-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 768px) {
+  .premium-banner {
+    margin: 0.75rem 0;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .banner-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .upgrade-btn {
+    padding: 0.6rem 1.5rem;
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+/* Premium Modal */
+.premium-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  overflow: hidden;
+  padding: 0;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  width: 90vw;
+  max-width: 1200px;
+  height: 90vh;
+  max-height: 800px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-right: 3rem;
+}
+
+.modal-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 2rem;
+}
+
+.modal-header p {
+  margin: 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Plans Grid */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.plan-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+  background: white;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card.popular {
+  border-color: #667eea;
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+}
+
+.plan-card.current {
+  border-color: #4caf50;
+  background: #f8fff8;
+}
+
+.popular-badge, .current-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+}
+
+.popular-badge {
+  background: #667eea;
+}
+
+.current-badge {
+  background: #4caf50;
+}
+
+.plan-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.price {
+  margin-bottom: 2rem;
+}
+
+.amount {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.period {
+  font-size: 1rem;
+  color: #666;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  text-align: left;
+}
+
+.features-list li {
+  padding: 0.5rem 0;
+  color: #333;
+}
+
+.plan-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #667eea;
+  color: white;
+  font-size: 1rem;
+}
+
+.plan-btn:hover:not(:disabled) {
+  background: #5a6fd8;
+  transform: translateY(-2px);
+}
+
+.plan-btn.current-plan {
+  background: #4caf50;
+  cursor: default;
+}
+
+.plan-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Features Showcase */
+.features-showcase {
+  margin: 1.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.features-showcase h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.feature-card {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.feature-card p {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.benefit {
+  font-size: 0.8rem;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* Guarantee */
+.guarantee {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  margin-top: 2rem;
+}
+
+.guarantee p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .premium-modal {
+    padding: 0;
+    overflow: auto;
+  }
+  
+  .modal-content {
+    width: 95vw;
+    height: 95vh;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: hidden;
+  }
+  
+  .close-btn {
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.25rem;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .modal-header {
+    margin-bottom: 1rem;
+    padding-right: 2rem;
+  }
+  
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .plan-card {
+    padding: 0.75rem;
+  }
+  
+  .plan-card.popular {
+    transform: none;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .amount {
+    font-size: 1.75rem;
+  }
+  
+  .features-showcase h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 98vw;
+    height: 98vh;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    padding-right: 1.5rem;
+  }
+  
+  .plans-grid {
+    gap: 0.5rem;
+  }
+  
+  .plan-card {
+    padding: 0.5rem;
+    min-width: 0;
+  }
+  
+  .features-grid {
+    gap: 0.5rem;
+  }
+  
+  .feature-card {
+    padding: 0.75rem;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .amount {
+    font-size: 1.5rem;
+  }
+}

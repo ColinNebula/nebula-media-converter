@@ -1,0 +1,114 @@
+.conversion-options {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 20px 0;
+}
+
+.conversion-options h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  word-wrap: break-word;
+}
+
+.file-info {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 15px 0;
+}
+
+.file-info p {
+  margin: 5px 0;
+  color: #666;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  word-wrap: break-word;
+}
+
+.format-selection {
+  margin: 20px 0;
+}
+
+.format-selection label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+}
+
+.format-selection select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  background: white;
+  box-sizing: border-box;
+}
+
+.format-selection select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.convert-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.convert-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.convert-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .conversion-options {
+    padding: 1rem;
+    margin: 15px 0;
+    border-radius: 8px;
+  }
+  
+  .file-info {
+    padding: 0.75rem;
+  }
+  
+  .format-selection select {
+    padding: 10px;
+  }
+  
+  .convert-btn {
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .conversion-options {
+    padding: 0.75rem;
+    margin: 10px 0;
+  }
+  
+  .file-info {
+    padding: 0.5rem;
+  }
+  
+  .format-selection {
+    margin: 15px 0;
+  }
+}
