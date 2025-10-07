@@ -41,12 +41,12 @@ const FileUpload = ({ onFileSelect, isProcessing }) => {
       });
       
       // Check if it's a valid media file
-      if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
+      if (file.type.startsWith('video/') || file.type.startsWith('audio/') || file.type.startsWith('image/')) {
         console.log('Valid media file, calling onFileSelect');
         onFileSelect(file);
       } else {
         console.log('Invalid file type:', file.type);
-        alert('Please select a valid video or audio file.');
+        alert('Please select a valid video, audio, or image file.');
       }
     }
   }, [onFileSelect]);
@@ -82,7 +82,7 @@ const FileUpload = ({ onFileSelect, isProcessing }) => {
       <input 
         id="file-input"
         type="file"
-        accept="video/*,audio/*"
+        accept="video/*,audio/*,image/*"
         onChange={handleFileInput}
         style={{ display: 'none' }}
         disabled={isProcessing}
@@ -92,9 +92,9 @@ const FileUpload = ({ onFileSelect, isProcessing }) => {
       ) : (
         <div className="upload-content">
           <div className="upload-icon">📁</div>
-          <p>Drag & drop a video or audio file here, or click to select</p>
+          <p>Drag & drop a video, audio, or image file here, or click to select</p>
           <p className="supported-formats">
-            Supported formats: MP4, AVI, MOV, MKV, WebM, FLV, MP3, WAV, FLAC, AAC, OGG, M4A
+            Supported formats: MP4, AVI, MOV, MKV, WebM, FLV, MP3, WAV, FLAC, AAC, OGG, M4A, JPG, PNG, GIF, BMP
           </p>
         </div>
       )}

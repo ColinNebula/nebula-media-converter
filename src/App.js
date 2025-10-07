@@ -42,7 +42,6 @@ function App() {
     retentionPeriod: 7 * 24 * 60 * 60 * 1000, // 7 days
     apiEndpoint: process.env.REACT_APP_API_ENDPOINT || 'https://api.nebula.com'
   }));
-  const [uploadedFileKey, setUploadedFileKey] = useState(null);
   const [storageStats, setStorageStats] = useState({ used: 0, limit: 0 });
 
   // Check for admin mode on load
@@ -185,42 +184,27 @@ function App() {
     console.log('handleFileSelect called with:', file);
     setError(null);
     setProgress(0);
-    setCurrentStep('Uploading file...');
-    setIsProcessing(true);
+    setCurrentStep('File selected');
+    setIsProcessing(false);
 
     try {
-      // Upload file to cloud storage
-      const uploadResult = await cloudStorage.uploadFile(file, {
-        userId: userSubscription?.user?.id || 'anonymous',
-        folder: 'uploads',
-        isTemporary: true,
-        onProgress: (progress, message) => {
-          setProgress(progress * 0.3); // Upload takes 30% of total progress
-          setCurrentStep(message || 'Uploading...');
-        },
-        onError: (error) => {
-          setError(`Upload failed: ${error.message}`);
-        }
-      });
-
-      setUploadedFileKey(uploadResult.fileKey);
+      // Set file directly for immediate conversion
       setSelectedFile(file);
       setOutputFormat('');
       setConvertedFile(null);
-      setProgress(30);
-      setCurrentStep('File uploaded successfully');
-    } catch (error) {
-      console.error('File upload error:', error);
-      setError(`Failed to upload file: ${error.message}`);
-    } finally {
-      setIsProcessing(false);
       setProgress(0);
-      setCurrentStep('');
+      setCurrentStep('File ready for conversion');
+    } catch (error) {
+      console.error('File selection error:', error);
+      setError(`Failed to select file: ${error.message}`);
     }
-  }, [cloudStorage, userSubscription]);
+  }, []);
 
   const handleConvert = async () => {
-    if (!selectedFile || !outputFormat || !uploadedFileKey) return;
+    if (!selectedFile || !outputFormat) {
+      setError('Please select a file and output format');
+      return;
+    }
 
     setIsProcessing(true);
     setProgress(0);
@@ -228,65 +212,26 @@ function App() {
     setError(null);
 
     try {
-      // Download file from cloud storage for processing
-      setCurrentStep('Downloading file for conversion...');
+      setCurrentStep('Loading FFmpeg...');
       setProgress(10);
-      
-      const fileBlob = await cloudStorage.downloadFile(uploadedFileKey, {
-        onProgress: (progress) => {
-          setProgress(10 + (progress * 0.2)); // Download: 10-30%
-        }
-      });
-
-      // Create file object for conversion
-      const fileForConversion = new File([fileBlob], selectedFile.name, {
-        type: selectedFile.type
-      });
-
-      setCurrentStep('Converting file...');
-      setProgress(30);
 
       const result = await converter.convert(
-        fileForConversion,
+        selectedFile,
         outputFormat,
         (progress, step) => {
-          setProgress(30 + (progress * 0.5)); // Conversion: 30-80%
+          setProgress(10 + (progress * 0.9)); // Conversion: 10-100%
           setCurrentStep(step);
         }
       );
 
-      // Upload converted file to cloud storage
-      setCurrentStep('Uploading converted file...');
-      setProgress(80);
-
-      const convertedFile = new File([result.blob], result.filename, {
-        type: result.blob.type
-      });
-
-      const uploadResult = await cloudStorage.uploadFile(convertedFile, {
-        userId: userSubscription?.user?.id || 'anonymous',
-        folder: 'converted',
-        isTemporary: true,
-        onProgress: (progress) => {
-          setProgress(80 + (progress * 0.2)); // Upload: 80-100%
-        }
-      });
-
-      // Generate CDN URL for download
-      const downloadUrl = await cloudStorage.getDownloadUrl(uploadResult.fileKey, 3600); // 1 hour expiry
-      
       setConvertedFile({
-        ...result,
-        cloudFileKey: uploadResult.fileKey,
-        downloadUrl: downloadUrl
+        blob: result.blob,
+        filename: result.filename,
+        downloadUrl: URL.createObjectURL(result.blob)
       });
       
       setProgress(100);
       setCurrentStep('Conversion complete!');
-      
-      // Schedule cleanup of temporary files
-      await cloudStorage.scheduleCleanup(uploadedFileKey, 24 * 60 * 60 * 1000); // 24 hours
-      await cloudStorage.scheduleCleanup(uploadResult.fileKey, 7 * 24 * 60 * 60 * 1000); // 7 days
       
     } catch (err) {
       console.error('Conversion error:', err);
@@ -296,26 +241,13 @@ function App() {
     }
   };
 
-  const handleReset = async () => {
-    // Clean up uploaded files when resetting
-    if (uploadedFileKey) {
-      try {
-        await cloudStorage.deleteFile(uploadedFileKey);
-      } catch (error) {
-        console.warn('Failed to delete uploaded file:', error);
-      }
-    }
-    
-    if (convertedFile?.cloudFileKey) {
-      try {
-        await cloudStorage.deleteFile(convertedFile.cloudFileKey);
-      } catch (error) {
-        console.warn('Failed to delete converted file:', error);
-      }
+  const handleReset = () => {
+    // Clean up blob URLs to prevent memory leaks
+    if (convertedFile?.downloadUrl) {
+      URL.revokeObjectURL(convertedFile.downloadUrl);
     }
 
     setSelectedFile(null);
-    setUploadedFileKey(null);
     setOutputFormat('');
     setConvertedFile(null);
     setError(null);

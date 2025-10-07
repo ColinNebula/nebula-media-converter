@@ -5,6 +5,7 @@ const ConversionOptions = ({ selectedFile, outputFormat, setOutputFormat, onConv
   const getFileType = (file) => {
     if (file.type.startsWith('video/')) return 'video';
     if (file.type.startsWith('audio/')) return 'audio';
+    if (file.type.startsWith('image/')) return 'image';
     return 'unknown';
   };
 
@@ -29,7 +30,24 @@ const ConversionOptions = ({ selectedFile, outputFormat, setOutputFormat, onConv
     { value: 'm4a', label: 'M4A' }
   ];
 
-  const formats = fileType === 'video' ? videoFormats : audioFormats;
+  const imageFormats = [
+    { value: 'jpg', label: 'JPEG' },
+    { value: 'png', label: 'PNG' },
+    { value: 'gif', label: 'GIF' },
+    { value: 'bmp', label: 'BMP' },
+    { value: 'webp', label: 'WebP' }
+  ];
+
+  const getFormats = () => {
+    switch (fileType) {
+      case 'video': return videoFormats;
+      case 'audio': return audioFormats;
+      case 'image': return imageFormats;
+      default: return [];
+    }
+  };
+
+  const formats = getFormats();
 
   if (!selectedFile) return null;
 
