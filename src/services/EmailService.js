@@ -1,8 +1,11 @@
 // Email Service for Nebula
+import emailJSService from './EmailJSService';
+
 class EmailService {
   constructor() {
     this.apiEndpoint = process.env.REACT_APP_EMAIL_API || 'https://api.nebula.com/email';
-    this.emailProvider = process.env.REACT_APP_EMAIL_PROVIDER || 'sendgrid'; // sendgrid, mailgun, ses
+    this.emailProvider = process.env.REACT_APP_EMAIL_PROVIDER || 'emailjs'; // emailjs, sendgrid, mailgun, ses
+    this.emailJSService = emailJSService;
     this.templates = {
       welcome: 'welcome-template',
       verification: 'email-verification',
@@ -25,6 +28,12 @@ class EmailService {
   // Send single email
   async sendEmail(emailData) {
     try {
+      // If EmailJS is configured, use it for real email sending
+      if (this.emailProvider === 'emailjs' && this.emailJSService.isConfigured()) {
+        return await this.sendViaEmailJS(emailData);
+      }
+
+      // Fallback to mock API for other providers
       const payload = {
         to: emailData.to,
         from: emailData.from || 'noreply@nebula.com',
@@ -41,7 +50,7 @@ class EmailService {
 
       // In production, this would make an actual API call
       // For now, we'll simulate and log the email
-      console.log('Sending email:', payload);
+      console.log('Sending email via mock API:', payload);
       
       const response = await this.mockEmailAPI(payload);
       
@@ -66,6 +75,82 @@ class EmailService {
         error: error.message,
         timestamp: Date.now()
       });
+      throw error;
+    }
+  }
+
+  // Send email via EmailJS
+  async sendViaEmailJS(emailData) {
+    try {
+      let result;
+      
+      // Route to appropriate EmailJS method based on template
+      switch (emailData.template) {
+        case 'welcome':
+        case this.templates.welcome:
+          result = await this.emailJSService.sendWelcomeEmail(
+            emailData.to,
+            emailData.templateData?.userName || 'User'
+          );
+          break;
+          
+        case 'conversion':
+        case this.templates.conversion:
+          result = await this.emailJSService.sendConversionNotification(
+            emailData.to,
+            emailData.templateData?.fileName || 'file',
+            emailData.templateData?.outputFormat || 'unknown'
+          );
+          break;
+          
+        case 'upgrade':
+        case this.templates.upgrade:
+          result = await this.emailJSService.sendUpgradeConfirmation(
+            emailData.to,
+            emailData.templateData?.planName || 'Premium',
+            emailData.templateData?.features || []
+          );
+          break;
+          
+        case 'newsletter':
+        case this.templates.newsletter:
+          result = await this.emailJSService.sendNewsletter(
+            emailData.to,
+            emailData.subject,
+            emailData.templateData?.content || emailData.text || emailData.html
+          );
+          break;
+          
+        default:
+          // For custom emails, use the newsletter method with custom content
+          result = await this.emailJSService.sendNewsletter(
+            emailData.to,
+            emailData.subject,
+            emailData.text || emailData.html || 'Message sent from Nebula Media Converter'
+          );
+      }
+      
+      // Log the activity
+      this.logEmailActivity({
+        action: 'EMAIL_SENT_EMAILJS',
+        to: emailData.to,
+        subject: emailData.subject,
+        template: emailData.template,
+        status: result.success ? 'success' : 'failed',
+        messageId: result.messageId,
+        timestamp: Date.now(),
+        provider: 'emailjs'
+      });
+      
+      return {
+        success: result.success,
+        messageId: result.messageId,
+        provider: 'emailjs',
+        timestamp: result.timestamp
+      };
+      
+    } catch (error) {
+      console.error('EmailJS sending failed:', error);
       throw error;
     }
   }

@@ -16,6 +16,8 @@ import AdminDashboard from './components/AdminDashboard';
 import MediaConverter from './utils/MediaConverter';
 import CloudStorageService from './services/CloudStorageService';
 import adminAuthService from './services/AdminAuthService';
+import emailJSService from './services/EmailJSService';
+import ContactForm from './components/ContactForm';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +35,7 @@ function App() {
   const [convertedFile, setConvertedFile] = useState(null);
   const [error, setError] = useState(null);
   const [advancedSettings, setAdvancedSettings] = useState({});
+  const [showContactForm, setShowContactForm] = useState(false);
   const [converter] = useState(() => new MediaConverter());
   const [cloudStorage] = useState(() => new CloudStorageService({
     provider: 'aws',
@@ -233,6 +236,22 @@ function App() {
       setProgress(100);
       setCurrentStep('Conversion complete!');
       
+      // Send conversion completion email if user has provided email
+      try {
+        const userEmail = userSubscription?.user?.email;
+        if (userEmail && emailJSService.isConfigured()) {
+          await emailJSService.sendConversionNotification(
+            userEmail,
+            selectedFile.name,
+            outputFormat
+          );
+          console.log('Conversion notification email sent');
+        }
+      } catch (emailError) {
+        console.warn('Failed to send conversion notification:', emailError);
+        // Don't fail the conversion if email fails
+      }
+      
     } catch (err) {
       console.error('Conversion error:', err);
       setError(err.message || 'Conversion failed');
@@ -255,7 +274,7 @@ function App() {
     setCurrentStep('');
   };
 
-  const handleUpgrade = (planName, subscriptionData) => {
+  const handleUpgrade = async (planName, subscriptionData) => {
     // Handle successful subscription upgrade
     console.log('Upgrading to:', planName, subscriptionData);
     setIsPremium(true);
@@ -264,6 +283,27 @@ function App() {
     // Store subscription data in localStorage for persistence
     localStorage.setItem('nebula_subscription', JSON.stringify(subscriptionData));
     localStorage.setItem('nebula_premium', 'true');
+    
+    // Send upgrade confirmation email
+    try {
+      const userEmail = subscriptionData?.user?.email;
+      if (userEmail && emailJSService.isConfigured()) {
+        const features = [
+          'Unlimited file conversions',
+          'Larger file size limits (up to 5GB)',
+          'Priority processing speed',
+          'Advanced conversion settings',
+          'Premium customer support',
+          'Batch processing capabilities'
+        ];
+        
+        await emailJSService.sendUpgradeConfirmation(userEmail, planName, features);
+        console.log('Upgrade confirmation email sent');
+      }
+    } catch (emailError) {
+      console.warn('Failed to send upgrade confirmation:', emailError);
+      // Don't fail the upgrade if email fails
+    }
   };
 
   const handleAdvancedSettingsChange = (newSettings) => {
@@ -481,9 +521,22 @@ function App() {
           
           <footer className="App-footer">
             <p>Built with React and FFmpeg.wasm</p>
+            <button 
+              className="contact-btn"
+              onClick={() => setShowContactForm(true)}
+              title="Contact us for support or feedback"
+            >
+              📧 Contact Us
+            </button>
           </footer>
         </div>
       )}
+      
+      {/* Contact Form Modal */}
+      <ContactForm 
+        isOpen={showContactForm}
+        onClose={() => setShowContactForm(false)}
+      />
     </>
   );
 }
