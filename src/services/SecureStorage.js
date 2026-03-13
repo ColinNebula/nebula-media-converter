@@ -49,9 +49,11 @@ class SecureStorage {
     }
   }
   
-  // Generate a simple key (in production, use proper key derivation)
+  // Generate a cryptographically secure random key
   generateKey() {
-    return Math.random().toString(36).substr(2, 16) + Date.now().toString(36);
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
   }
   
   // Secure storage methods

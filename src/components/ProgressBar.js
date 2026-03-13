@@ -1,12 +1,20 @@
 import React from 'react';
 import './ProgressBar.css';
 
-const ProgressBar = ({ progress, isProcessing, currentStep, error }) => {
-  if (!isProcessing && !error) return null;
+const ProgressBar = ({ progress, isProcessing, currentStep, error, connectionError }) => {
+  if (!isProcessing && !error && !connectionError) return null;
 
   return (
     <div className="progress-container">
-      {error ? (
+      {connectionError ? (
+        <div className="connection-error-message">
+          <h4>🌐 Connection Issue</h4>
+          <p>{connectionError}</p>
+          <div className="connection-help">
+            <p>🔧 The Connection Manager above will help diagnose and fix this issue.</p>
+          </div>
+        </div>
+      ) : error ? (
         <div className="error-message">
           <h4>❌ Conversion Failed</h4>
           <p>{error}</p>

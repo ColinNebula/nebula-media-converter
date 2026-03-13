@@ -215,7 +215,7 @@ The Nebula Team`,
 
     try {
       const templateParams = {
-        to_email: process.env.REACT_APP_ADMIN_EMAIL || process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com',
+        to_email: process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com',
         to_name: 'Admin',
         from_name: fromName,
         from_email: fromEmail,
@@ -385,7 +385,7 @@ Nebula3D Dev Company`,
 
     try {
       const testParams = {
-        to_email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebuladev.com',
+        to_email: process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com',
         to_name: 'Admin',
         from_name: 'Nebula Media Converter Test',
         subject: 'EmailJS Connection Test',

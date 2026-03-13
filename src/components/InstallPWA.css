@@ -1,0 +1,245 @@
+/* InstallPWA Styles */
+.install-pwa-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  pointer-events: none;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.install-pwa-prompt {
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 20px;
+  margin: 16px;
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  pointer-events: auto;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.install-pwa-prompt.ios-prompt {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 28px 24px;
+}
+
+.install-pwa-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.install-pwa-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.install-pwa-icon {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.install-pwa-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.install-pwa-content p {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  text-align: center;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+.install-pwa-features {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.feature-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.install-pwa-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.install-pwa-button {
+  flex: 1;
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.install-pwa-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.install-pwa-button:active {
+  transform: translateY(0);
+}
+
+.install-pwa-dismiss {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.install-pwa-dismiss:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* iOS Instructions */
+.ios-instructions {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  text-align: left;
+  list-style-position: inside;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.ios-instructions li {
+  margin: 8px 0;
+}
+
+.ios-instructions strong {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.ios-icon {
+  display: inline-block;
+  font-size: 18px;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .install-pwa-prompt {
+    margin: 12px;
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .install-pwa-content h3 {
+    font-size: 20px;
+  }
+
+  .install-pwa-content p {
+    font-size: 14px;
+  }
+
+  .install-pwa-icon {
+    font-size: 40px;
+  }
+
+  .install-pwa-actions {
+    flex-direction: column;
+  }
+
+  .install-pwa-button,
+  .install-pwa-dismiss {
+    width: 100%;
+  }
+
+  .ios-instructions {
+    font-size: 14px;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .install-pwa-prompt {
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  }
+}
+
+/* Desktop specific styles */
+@media (min-width: 769px) {
+  .install-pwa-container {
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+  }
+
+  .install-pwa-prompt {
+    margin: 0;
+    max-width: 400px;
+  }
+}

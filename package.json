@@ -10,23 +10,70 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "electron-is-dev": "^3.0.1",
+    "mammoth": "^1.12.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.4.168",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-dropzone": "^14.2.3",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
+    "tesseract.js": "^6.0.1",
+    "three": "^0.183.2",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "cmake-js": "^7.3.0",
+    "concurrently": "^9.1.0",
+    "electron": "^38.4.0",
+    "electron-builder": "^26.8.1",
+    "html-webpack-plugin": "^5.6.4",
+    "node-addon-api": "^8.2.1",
+    "node-gyp": "^10.2.0",
+    "wait-on": "^8.0.1"
+  },
+  "main": "public/electron.js",
+  "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/ --ext .js,.jsx",
+    "lint:fix": "eslint src/ --ext .js,.jsx --fix",
+    "security:audit": "npm audit --audit-level=high",
+    "security:audit:fix": "npm audit fix",
+    "security:check": "npm run security:audit && echo Security check passed",
+    "prepare:github": "powershell -ExecutionPolicy Bypass -File ./scripts/prepare-for-github.ps1",
+    "prepare:github:unix": "bash ./scripts/prepare-for-github.sh",
+    "prebuild": "npm run security:audit",
+    "electron:dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run build && electron-builder",
+    "addon:build": "cmake-js compile",
+    "addon:rebuild": "cmake-js rebuild",
+    "desktop:dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "desktop:build": "npm run build && electron-builder",
+    "install": "echo Skipping native addon build - will use FFmpeg.wasm fallback"
+  },
+  "overrides": {
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.47",
+    "serialize-javascript": "^7.0.3",
+    "underscore": "^1.13.8",
+    "tar": "^7.5.11",
+    "yauzl": "^3.2.1"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-eval": "error",
+      "no-implied-eval": "error",
+      "no-new-func": "error"
+    }
   },
   "browserslist": {
     "production": [

@@ -2,9 +2,8 @@
 class ConfigValidator {
   constructor() {
     this.requiredVars = [
-      'REACT_APP_ADMIN_USERNAME',
-      'REACT_APP_ADMIN_PASSWORD', 
-      'REACT_APP_ADMIN_EMAIL'
+      // Admin credentials are server-side only (ADMIN_USERNAME / ADMIN_PASSWORD_HASH).
+      // Do NOT add REACT_APP_ADMIN_* here — those would be bundled into client JS.
     ];
     
     this.recommendedVars = [
@@ -168,7 +167,7 @@ class ConfigValidator {
       companyName: process.env.REACT_APP_COMPANY_NAME || 'Nebula3D Dev Company',
       developerName: process.env.REACT_APP_DEVELOPER_NAME || 'Colin Nebula',
       appUrl: process.env.REACT_APP_APP_URL || 'https://colinnebula.github.io/nebula-media-converter/',
-      supportEmail: process.env.REACT_APP_SUPPORT_EMAIL || process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebuladev.com',
+      supportEmail: process.env.REACT_APP_SUPPORT_EMAIL || 'admin@nebuladev.com',
       
       // API Endpoints
       apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'https://api.nebuladev.com',
@@ -176,9 +175,7 @@ class ConfigValidator {
       paymentApiUrl: process.env.REACT_APP_PAYMENT_API || 'https://payments.nebuladev.com',
       cdnUrl: process.env.REACT_APP_CDN_URL || 'https://cdn.nebuladev.com',
       
-      // Admin Configuration
-      adminUsername: process.env.REACT_APP_ADMIN_USERNAME,
-      adminEmail: process.env.REACT_APP_ADMIN_EMAIL,
+      // Admin config intentionally omitted — credentials are server-side only
       
       // EmailJS Configuration
       emailJS: {

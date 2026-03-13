@@ -64,7 +64,10 @@ const ConversionOptions = ({ selectedFile, outputFormat, setOutputFormat, onConv
         <select 
           id="output-format"
           value={outputFormat} 
-          onChange={(e) => setOutputFormat(e.target.value)}
+          onChange={(e) => {
+            console.log('🔵 Format selected:', e.target.value);
+            setOutputFormat(e.target.value);
+          }}
           disabled={isProcessing}
         >
           <option value="">Select output format</option>
@@ -78,8 +81,19 @@ const ConversionOptions = ({ selectedFile, outputFormat, setOutputFormat, onConv
 
       <button 
         className="convert-btn"
-        onClick={onConvert}
+        onClick={(e) => {
+          console.log('🔵 Convert button clicked!', { outputFormat, isProcessing });
+          e.stopPropagation();
+          if (onConvert) {
+            onConvert();
+          } else {
+            console.error('❌ onConvert is not defined!');
+          }
+        }}
+        onMouseDown={() => console.log('🖱️ Convert button mousedown')}
+        onMouseUp={() => console.log('🖱️ Convert button mouseup')}
         disabled={!outputFormat || isProcessing}
+        style={{ cursor: 'pointer', position: 'relative', zIndex: 10 }}
       >
         {isProcessing ? 'Converting...' : 'Start Conversion'}
       </button>

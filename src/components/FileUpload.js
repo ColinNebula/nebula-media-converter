@@ -80,8 +80,17 @@ const FileUpload = ({ onFileSelect, isProcessing }) => {
   }, [onFileSelect]);
 
   const handleClick = useCallback(() => {
+    console.log('🔵 FileUpload area clicked!', { isProcessing });
     if (!isProcessing) {
-      document.getElementById('file-input').click();
+      const input = document.getElementById('file-input');
+      if (input) {
+        console.log('✅ Triggering file input click');
+        input.click();
+      } else {
+        console.error('❌ File input not found!');
+      }
+    } else {
+      console.log('⚠️ Click blocked - processing in progress');
     }
   }, [isProcessing]);
 

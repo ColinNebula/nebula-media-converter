@@ -1,0 +1,76 @@
+# Electron Builder Configuration
+appId: com.nebula3d.mediaconverter
+productName: Nebula Media Converter
+copyright: Copyright © 2025 Nebula3D Dev Company
+
+directories:
+  buildResources: build
+  output: dist
+
+files:
+  - build/**/*
+  - public/electron.js
+  - public/preload.js
+  - node_modules/**/*
+  - package.json
+
+# Include native C++ addon if built
+extraResources:
+  - from: build/Release
+    to: build/Release
+    filter:
+      - "*.node"
+
+# Platform-specific configuration
+win:
+  target:
+    - nsis
+    - portable
+  icon: build/icon.ico
+  publisherName: Nebula3D Dev Company
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Nebula Media Converter
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.productivity
+  icon: build/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+
+dmg:
+  title: Nebula Media Converter
+  icon: build/icon.icns
+  background: build/background.png
+  window:
+    width: 540
+    height: 380
+
+linux:
+  target:
+    - AppImage
+    - deb
+    - rpm
+  category: AudioVideo
+  icon: build/icon.png
+  synopsis: Professional media file converter
+  description: Transform media files with professional-grade processing
+
+# Auto-update configuration
+publish:
+  provider: github
+  owner: ColinNebula
+  repo: nebula-media-converter
+
+# Compression
+compression: maximum
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}

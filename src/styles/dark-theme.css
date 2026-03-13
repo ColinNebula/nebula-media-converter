@@ -1,0 +1,293 @@
+/* Global Dark Theme Styles */
+
+html[data-theme='dark'],
+:root[data-theme='dark'] {
+  /* Color Palette */
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #2d2d44;
+  --bg-tertiary: #3d3d54;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #808080;
+  --border-color: #3d3d54;
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --success: #80d88e;
+  --error: #ff8a95;
+  --warning: #ffd966;
+  --info: #6dd9ec;
+}
+
+html[data-theme='dark'] body,
+[data-theme='dark'] body {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary);
+}
+
+/* App Container */
+[data-theme='dark'] .App {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary);
+}
+
+/* Main content area */
+[data-theme='dark'] .App-main {
+  background: var(--bg-secondary) !important;
+}
+
+/* Converter container */
+[data-theme='dark'] .converter-container {
+  background: var(--bg-primary) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Tab navigation */
+[data-theme='dark'] .converter-tabs {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .tab-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tab-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tab-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+/* Inputs and Form Elements */
+[data-theme='dark'] input,
+[data-theme='dark'] textarea,
+[data-theme='dark'] select {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme='dark'] input:focus,
+[data-theme='dark'] textarea:focus,
+[data-theme='dark'] select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* Buttons */
+[data-theme='dark'] button {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] button:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning) {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] button:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning):hover {
+  background: var(--bg-secondary);
+}
+
+/* Links */
+[data-theme='dark'] a {
+  color: var(--accent-primary);
+}
+
+[data-theme='dark'] a:hover {
+  color: var(--accent-secondary);
+}
+
+/* Tables */
+[data-theme='dark'] table {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] td {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] tr:hover {
+  background: var(--bg-tertiary);
+}
+
+/* Scrollbars */
+[data-theme='dark'] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: #4d4d64;
+}
+
+/* Modals and Overlays */
+[data-theme='dark'] .modal,
+[data-theme='dark'] .dialog {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .modal-header {
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .modal-footer {
+  border-color: var(--border-color);
+}
+
+/* Progress Bars */
+[data-theme='dark'] .progress {
+  background: var(--bg-tertiary);
+}
+
+/* Alerts and Notifications */
+[data-theme='dark'] .alert-success {
+  background: rgba(128, 216, 142, 0.2);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+[data-theme='dark'] .alert-error {
+  background: rgba(255, 138, 149, 0.2);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+[data-theme='dark'] .alert-warning {
+  background: rgba(255, 217, 102, 0.2);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+[data-theme='dark'] .alert-info {
+  background: rgba(109, 217, 236, 0.2);
+  border-color: var(--info);
+  color: var(--info);
+}
+
+/* Dropdown Menus */
+[data-theme='dark'] .dropdown,
+[data-theme='dark'] .menu {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='dark'] .dropdown-item,
+[data-theme='dark'] .menu-item {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .dropdown-item:hover,
+[data-theme='dark'] .menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+/* Headers and Titles */
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6 {
+  color: var(--text-primary);
+}
+
+/* Code Blocks */
+[data-theme='dark'] code,
+[data-theme='dark'] pre {
+  background: var(--bg-tertiary);
+  color: #f8f8f2;
+  border-color: var(--border-color);
+}
+
+/* Badges and Tags */
+[data-theme='dark'] .badge,
+[data-theme='dark'] .tag {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Loading States */
+[data-theme='dark'] .skeleton-box,
+[data-theme='dark'] .skeleton-circle {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-tertiary) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Tooltips */
+[data-theme='dark'] .tooltip {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* File Upload Areas */
+[data-theme='dark'] .file-upload-area {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .file-upload-area:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+}
+
+/* Smooth Transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Animation: Keep animations smooth during theme change */
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme] * {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+}
+
+/* Light Theme Overrides (ensure clean switch back) */
+:root[data-theme='light'] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border-color: #e0e0e0;
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --success: #28a745;
+  --error: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+}

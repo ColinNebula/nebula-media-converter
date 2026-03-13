@@ -5,49 +5,98 @@ class MediaConverter {
   constructor() {
     this.ffmpeg = new FFmpeg();
     this.isLoaded = false;
+    this.retryCount = 0;
+    this.maxRetries = 3;
   }
 
   async load(onProgress) {
     if (this.isLoaded) return;
 
-    try {
-      onProgress?.(10, 'Loading FFmpeg...');
-      
-      // Load FFmpeg with CDN URLs - try multiple sources
-      const baseURLs = [
-        process.env.REACT_APP_FFMPEG_CDN_PRIMARY || 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
-        process.env.REACT_APP_FFMPEG_CDN_FALLBACK || 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd'
-      ];
+    const attemptLoad = async (attempt = 1) => {
+      try {
+        onProgress?.(10, `Loading FFmpeg... (Attempt ${attempt}/${this.maxRetries + 1})`);
+        
+        // Load FFmpeg with CDN URLs - try multiple sources with enhanced fallbacks
+        const baseURLs = [
+          process.env.REACT_APP_FFMPEG_CDN_PRIMARY || 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
+          process.env.REACT_APP_FFMPEG_CDN_FALLBACK || 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd',
+          'https://cdn.skypack.dev/@ffmpeg/core@0.12.6/dist/umd',
+          'https://esm.sh/@ffmpeg/core@0.12.6/dist/umd'
+        ];
 
-      let loadSuccess = false;
-      for (const baseURL of baseURLs) {
-        try {
-          onProgress?.(20, `Trying CDN: ${baseURL.includes('unpkg') ? 'unpkg' : 'jsdelivr'}...`);
-          
-          await this.ffmpeg.load({
-            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-          });
-          
-          loadSuccess = true;
-          break;
-        } catch (error) {
-          console.warn(`Failed to load from ${baseURL}:`, error);
-          if (baseURL === baseURLs[baseURLs.length - 1]) {
-            throw error; // Re-throw if it's the last attempt
+        let loadSuccess = false;
+        let lastError = null;
+
+        for (let i = 0; i < baseURLs.length; i++) {
+          const baseURL = baseURLs[i];
+          try {
+            const cdnName = baseURL.includes('unpkg') ? 'unpkg' : 
+                           baseURL.includes('jsdelivr') ? 'jsdelivr' : 
+                           baseURL.includes('skypack') ? 'skypack' : 'esm.sh';
+            
+            onProgress?.(15 + i * 5, `Trying CDN: ${cdnName}...`);
+            
+            // Add timeout to CDN requests
+            const loadPromise = this.ffmpeg.load({
+              coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+              wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+            });
+
+            // Race with timeout
+            await Promise.race([
+              loadPromise,
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('CDN timeout')), 10000)
+              )
+            ]);
+            
+            loadSuccess = true;
+            onProgress?.(30, `FFmpeg loaded successfully from ${cdnName}`);
+            break;
+          } catch (error) {
+            lastError = error;
+            console.warn(`Failed to load from ${baseURL}:`, error);
+            
+            // If it's a network error, wait before trying next CDN
+            if (error.message.includes('Failed to fetch') || error.message.includes('timeout')) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
           }
         }
-      }
 
-      if (!loadSuccess) {
-        throw new Error('Failed to load FFmpeg from all CDN sources');
-      }
+        if (!loadSuccess) {
+          throw lastError || new Error('Failed to load FFmpeg from all CDN sources');
+        }
 
-      onProgress?.(30, 'FFmpeg loaded successfully');
-      this.isLoaded = true;
-    } catch (error) {
-      throw new Error(`Failed to load FFmpeg: ${error.message}. Please refresh the page and try again.`);
-    }
+        this.isLoaded = true;
+        this.retryCount = 0; // Reset retry count on success
+      } catch (error) {
+        if (attempt <= this.maxRetries && this.shouldRetry(error)) {
+          onProgress?.(5, `Retrying in 2 seconds... (${attempt}/${this.maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return attemptLoad(attempt + 1);
+        }
+        
+        throw new Error(`Failed to load FFmpeg after ${attempt} attempts: ${error.message}. Please check your internet connection and try refreshing the page.`);
+      }
+    };
+
+    return attemptLoad();
+  }
+
+  shouldRetry(error) {
+    const retryableErrors = [
+      'Failed to fetch',
+      'timeout',
+      'network',
+      'ERR_NETWORK',
+      'ERR_INTERNET_DISCONNECTED',
+      'CORS'
+    ];
+    
+    return retryableErrors.some(pattern => 
+      error.message.toLowerCase().includes(pattern.toLowerCase())
+    );
   }
 
   async convert(file, outputFormat, onProgress) {

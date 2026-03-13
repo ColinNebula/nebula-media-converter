@@ -3,10 +3,13 @@ import './SplashScreen.css';
 import NebulaLogo from './NebulaLogo';
 
 const SplashScreen = ({ isLoading }) => {
-  if (!isLoading) return null;
-
+  // Don't render anything when not loading
+  if (!isLoading) {
+    return null;
+  }
+  
   return (
-    <div className="splash-screen">
+    <div className="splash-screen" style={{ display: 'flex' }}>
       <div className="splash-content">
         <div className="splash-logo">
           <div className="nebula-icon">

@@ -1,0 +1,20 @@
+# Code Owners
+# These owners will be requested for review when someone opens a pull request
+
+# Default owners for everything
+* @ColinNebula
+
+# Security-related files require security review
+/.github/SECURITY.md @ColinNebula
+/.github/workflows/security.yml @ColinNebula
+/src/security/ @ColinNebula
+/.env.example @ColinNebula
+
+# Configuration files
+*.json @ColinNebula
+*.yml @ColinNebula
+*.yaml @ColinNebula
+
+# Documentation
+*.md @ColinNebula
+/docs/ @ColinNebula

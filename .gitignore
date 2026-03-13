@@ -1,24 +1,262 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ============================================
+# NEBULA MEDIA CONVERTER - COMPREHENSIVE GITIGNORE
+# Security-focused configuration for GitHub
+# ============================================
 
-# dependencies
-node_modules/
-**/node_modules/
-/.pnp
-.pnp.js
+# ==========================================
+# SENSITIVE FILES - NEVER COMMIT THESE!
+# ==========================================
 
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
+# Environment variables (contains secrets)
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+.env.staging
+*.env
 
+# Secret keys and credentials
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.cer
+secrets/
+credentials/
+private/
+*.secret
+*.secrets
+api_keys.json
+credentials.json
+service-account*.json
+firebase-admin*.json
+
+# Admin and authentication files
+admin-credentials.json
+auth-tokens.json
+oauth-tokens.json
+session-keys.json
+
+# ==========================================
+# DEPENDENCIES
+# ==========================================
+node_modules/
+**/node_modules/
+/.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ==========================================
+# BUILD OUTPUTS & LARGE FILES
+# ==========================================
+
+# Production build (can be rebuilt)
+/build
+/dist
+/out
+/.next
+/.nuxt
+
+# Compiled native addons
+/native/build/
+/backend/cpp_server/build/
+*.node
+*.dll
+*.so
+*.dylib
+*.obj
+*.o
+*.a
+*.lib
+*.exe
+
+# Binary and media files (large)
+*.wasm
+*.ffmpeg
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mkv
+*.mov
+*.flv
+*.wmv
+*.webm
+*.ogg
+*.flac
+*.aac
+*.m4a
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+*.iso
+*.dmg
+*.msi
+
+# Large test files
+test-files/
+test-media/
+sample-files/
+fixtures/large/
+
+# Vendored large binaries (copy on build, do not commit)
+public/pdf.worker.min.js
+public/pdf.worker.min.mjs
+
+# ==========================================
+# DEVELOPMENT & IDE
+# ==========================================
+
+# VS Code (keep settings, ignore workspace-specific)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.history
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+
+# Other IDEs
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ==========================================
+# TESTING & COVERAGE
+# ==========================================
+/coverage
+*.lcov
+.nyc_output
+test-results/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
+
+# ==========================================
+# LOGS & DEBUGGING
+# ==========================================
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+logs/
+*.log.*
+
+# ==========================================
+# OPERATING SYSTEM
+# ==========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ==========================================
+# TEMPORARY & CACHE FILES
+# ==========================================
+*.tmp
+*.temp
+*.cache
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.npm/
+.yarn-integrity
+
+# ==========================================
+# ELECTRON & DESKTOP BUILD
+# ==========================================
+/release/
+/out-*
+*.blockmap
+*.snap
+*.AppImage
+*.deb
+*.rpm
+
+# ==========================================
+# SECURITY-SPECIFIC
+# ==========================================
+
+# Backup files (may contain sensitive data)
+*.bak
+*.backup
+*.old
+*_backup
+*_old
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+
+# Heap dumps and core files
+*.heapsnapshot
+core.*
+*.core
+
+# Security scan results
+.scannerwork/
+security-report.json
+vulnerability-report.json
+
+# ==========================================
+# PROJECT-SPECIFIC EXCLUSIONS
+# ==========================================
+
+# FFmpeg binaries (downloaded at runtime)
+ffmpeg-core/
+ffmpeg-binaries/
+
+# User uploads (processed locally)
+uploads/
+temp-uploads/
+processed/
+
+# Electron packaged apps
+nebula-media-converter-*/
+
+# Native compilation artifacts
+/native/Release/
+/native/Debug/
+/native/.vs/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile

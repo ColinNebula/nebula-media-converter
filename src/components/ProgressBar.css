@@ -1,20 +1,21 @@
 .progress-container {
-  background: white;
+  background: var(--bg-primary);
   padding: 1.5rem;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
   margin: 20px 0;
   text-align: center;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .progress-container h4 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: clamp(1rem, 3vw, 1.2rem);
 }
 
 .current-step {
-  color: #666;
+  color: var(--text-secondary);
   margin: 10px 0;
   font-style: italic;
   font-size: clamp(0.8rem, 2.5vw, 0.9rem);
@@ -24,22 +25,23 @@
 .progress-bar {
   width: 100%;
   height: 20px;
-  background-color: #e9ecef;
+  background-color: var(--bg-tertiary);
   border-radius: 10px;
   overflow: hidden;
   margin: 15px 0;
+  transition: background-color 0.3s ease;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #007bff, #0056b3);
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
   transition: width 0.3s ease;
   border-radius: 10px;
 }
 
 .progress-text {
   margin: 10px 0 0 0;
-  color: #333;
+  color: var(--text-primary);
   font-weight: bold;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
@@ -58,6 +60,41 @@
   margin: 0;
   font-size: clamp(0.8rem, 2.5vw, 0.9rem);
   word-wrap: break-word;
+}
+
+.connection-error-message {
+  color: #ff9800;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 2px solid #ffcc02;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.connection-error-message h4 {
+  color: #e65100;
+  margin-bottom: 10px;
+}
+
+.connection-error-message p {
+  color: #bf360c;
+  margin: 0 0 10px 0;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  word-wrap: break-word;
+}
+
+.connection-help {
+  background: rgba(255, 152, 0, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 4px solid #ff9800;
+}
+
+.connection-help p {
+  margin: 0;
+  color: #e65100;
+  font-size: 0.9em;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {

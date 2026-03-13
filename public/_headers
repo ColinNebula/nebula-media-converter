@@ -1,0 +1,40 @@
+# Netlify/Vercel/GitHub Pages Security Headers
+# This file configures HTTP security headers for production deployments
+
+/*
+  # Prevent clickjacking attacks
+  X-Frame-Options: SAMEORIGIN
+  
+  # Prevent MIME type sniffing
+  X-Content-Type-Options: nosniff
+  
+  # Enable XSS protection
+  X-XSS-Protection: 1; mode=block
+  
+  # Referrer policy
+  Referrer-Policy: strict-origin-when-cross-origin
+  
+  # Content Security Policy (permissive for app functionality)
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://cdn.skypack.dev https://esm.sh blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self' blob: data: https://api.nebuladev.com https://email.nebuladev.com https://payments.nebuladev.com https://cdn.nebuladev.com https://api.github.com https://unpkg.com https://cdn.jsdelivr.net https://cdn.skypack.dev https://esm.sh https://www.googleapis.com https://api.dropbox.com https://content.dropboxapi.com; font-src 'self' data:; frame-src 'self' https://accounts.google.com https://www.dropbox.com;
+  
+  # Permissions Policy (formerly Feature-Policy)
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  
+  # CORS — restrict to same origin for PWA (override per-route below if needed)
+  # Access-Control-Allow-Origin: *  (removed — too permissive)
+  
+  # Cache control for service worker
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Service worker specific headers
+/service-worker.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  
+# Manifest caching
+/manifest.json
+  Cache-Control: public, max-age=3600
+  Content-Type: application/manifest+json
+
+# Static assets caching
+/static/*
+  Cache-Control: public, max-age=31536000, immutable

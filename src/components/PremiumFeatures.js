@@ -222,15 +222,17 @@ const PremiumFeatures = ({ isPremium, onUpgrade }) => {
       )}
 
       {showModal && (
-        <div className="premium-modal">
+        <div className="premium-modal" onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}>
           <div className="modal-content">
-            <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
-            
             <div className="modal-header">
-              <h2>Choose Your Plan</h2>
-              <p>Unlock the full potential of Nebula Media Converter</p>
+              <div className="modal-title-group">
+                <h2>Choose Your Plan</h2>
+                <p>Unlock the full potential of Nebula Media Converter</p>
+              </div>
+              <button className="close-btn" onClick={() => setShowModal(false)} aria-label="Close">×</button>
             </div>
 
+            <div className="modal-body">
             <div className="plans-grid">
               {plans.map((plan, index) => (
                 <div key={index} className={`plan-card ${plan.popular ? 'popular' : ''} ${plan.current ? 'current' : ''}`}>
@@ -276,6 +278,7 @@ const PremiumFeatures = ({ isPremium, onUpgrade }) => {
 
             <div className="guarantee">
               <p>💰 30-day money-back guarantee • ⚡ Instant activation • 🔒 Secure payment</p>
+            </div>
             </div>
           </div>
         </div>

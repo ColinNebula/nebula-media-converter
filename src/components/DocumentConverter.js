@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './DocumentConverter.css';
 import paymentService from '../services/PaymentService';
 import CheckoutModal from './CheckoutModal';
+import documentConverter from '../utils/DocumentConverterUtils';
 
 const DocumentConverter = ({ isPremium, onUpgrade }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -11,16 +12,15 @@ const DocumentConverter = ({ isPremium, onUpgrade }) => {
   const [error, setError] = useState(null);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
 
   const documentFormats = [
     { value: 'pdf', label: 'PDF', icon: '📄' },
     { value: 'docx', label: 'Word Document (DOCX)', icon: '📝' },
     { value: 'txt', label: 'Text File (TXT)', icon: '📃' },
-    { value: 'rtf', label: 'Rich Text Format (RTF)', icon: '📋' },
     { value: 'html', label: 'HTML', icon: '🌐' },
-    { value: 'epub', label: 'EPUB (eBook)', icon: '📚', premium: true },
-    { value: 'mobi', label: 'MOBI (Kindle)', icon: '📖', premium: true },
-    { value: 'odt', label: 'OpenDocument Text', icon: '📄', premium: true }
+    { value: 'rtf', label: 'Rich Text Format (RTF)', icon: '📋', inputOnly: true }
   ];
 
   const handleFileSelect = (event) => {
@@ -68,43 +68,51 @@ const DocumentConverter = ({ isPremium, onUpgrade }) => {
     if (!selectedFile) return [];
     
     const inputExtension = selectedFile.name.split('.').pop().toLowerCase();
+    const supportedOutputs = documentConverter.getSupportedConversions()[inputExtension] || [];
     
-    // Filter out the current format and premium formats if not premium user
+    // Filter formats to only show valid outputs for this input
     return documentFormats.filter(format => {
+      if (format.inputOnly) return false; // RTF is input-only
       if (format.value === inputExtension) return false;
-      if (format.premium && !isPremium) return false;
-      return true;
+      return supportedOutputs.includes(format.value);
     });
   };
 
-  const simulateConversion = async () => {
+  const performConversion = async () => {
     if (!selectedFile || !outputFormat) return;
 
     setIsProcessing(true);
     setError(null);
+    setProgress(0);
+    setProgressMessage('Initializing...');
 
     try {
-      // Simulate conversion process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Progress callback for real-time updates
+      const onProgress = (percent, message) => {
+        setProgress(percent);
+        setProgressMessage(message);
+      };
+
+      // Perform the real conversion
+      const result = await documentConverter.convert(selectedFile, outputFormat, onProgress);
       
-      // Create a mock converted file
+      // Create the converted file object
       const originalName = selectedFile.name.split('.').slice(0, -1).join('.');
-      const mockContent = `Converted ${selectedFile.name} to ${outputFormat.toUpperCase()} format\n\nThis is a demo conversion.`;
-      
-      const blob = new Blob([mockContent], { 
-        type: outputFormat === 'pdf' ? 'application/pdf' : 'text/plain' 
-      });
       
       setConvertedFile({
-        blob,
+        blob: result.blob,
         filename: `${originalName}.${outputFormat}`,
         originalSize: selectedFile.size,
-        convertedSize: blob.size
+        convertedSize: result.blob.size,
+        mimeType: result.mimeType
       });
     } catch (err) {
-      setError('Conversion failed. Please try again.');
+      console.error('Conversion error:', err);
+      setError(err.message || 'Conversion failed. Please try again.');
     } finally {
       setIsProcessing(false);
+      setProgress(0);
+      setProgressMessage('');
     }
   };
 
@@ -227,7 +235,7 @@ const DocumentConverter = ({ isPremium, onUpgrade }) => {
         <div className="convert-section">
           <button
             className="convert-document-btn"
-            onClick={simulateConversion}
+            onClick={performConversion}
             disabled={isProcessing}
           >
             {isProcessing ? 'Converting...' : `Convert to ${outputFormat.toUpperCase()}`}
@@ -238,8 +246,12 @@ const DocumentConverter = ({ isPremium, onUpgrade }) => {
       {/* Progress Indicator */}
       {isProcessing && (
         <div className="conversion-progress">
+          <div className="progress-bar-container">
+            <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+          </div>
           <div className="progress-spinner"></div>
-          <p>Converting your document...</p>
+          <p>{progressMessage || 'Converting your document...'}</p>
+          <p className="progress-percent">{progress}%</p>
         </div>
       )}
 
@@ -271,16 +283,27 @@ const DocumentConverter = ({ isPremium, onUpgrade }) => {
         </div>
       )}
 
-      {/* Premium Upsell */}
-      {!isPremium && (
-        <div className="premium-upsell">
-          <h4>🌟 Unlock More Formats</h4>
-          <p>Upgrade to Premium for EPUB, MOBI, ODT, and advanced conversion options</p>
-          <button className="upgrade-cta" onClick={handleUpgradeClick}>
-            Upgrade Now - $9.99/month
-          </button>
+      {/* Supported Conversions Info */}
+      <div className="conversion-info">
+        <h4>📋 Supported Conversions</h4>
+        <div className="conversion-grid">
+          <div className="conversion-item">
+            <strong>PDF</strong> → TXT, HTML, DOCX
+          </div>
+          <div className="conversion-item">
+            <strong>DOCX/DOC</strong> → PDF, HTML, TXT
+          </div>
+          <div className="conversion-item">
+            <strong>TXT</strong> → PDF, HTML, DOCX
+          </div>
+          <div className="conversion-item">
+            <strong>HTML</strong> → PDF, TXT, DOCX
+          </div>
+          <div className="conversion-item">
+            <strong>RTF</strong> → PDF, TXT, HTML, DOCX
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Checkout Modal */}
       <CheckoutModal

@@ -1,105 +1,109 @@
 // Admin Authentication Service
-import secureStorage from './SecureStorage';
-import SecurityUtils from '../utils/SecurityUtils';
+import InputValidator from '../security/InputValidator';
+import rateLimiter from '../security/RateLimiter';
 
 class AdminAuthService {
   constructor() {
-    this.adminCredentials = {
-      username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
-      password: process.env.REACT_APP_ADMIN_PASSWORD || 'nebula2025!',
-      email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@nebula.com',
-      role: 'super_admin',
-      permissions: ['all'],
-      subscriptionPlan: 'business',
-      isPremium: true,
-      features: {
-        unlimitedConversions: true,
-        prioritySupport: true,
-        advancedSettings: true,
-        batchProcessing: true,
-        apiAccess: true,
-        customBranding: true,
-        analytics: true,
-        multiUserAccess: true,
-        cloudStorage: 'unlimited',
-        retentionPeriod: 'unlimited'
-      }
-    };
+    this.backendUrl = process.env.REACT_APP_CPP_BACKEND_URL ||
+                     process.env.REACT_APP_API_BASE_URL ||
+                     'http://localhost:8080';
 
     this.sessionTimeout = 8 * 60 * 60 * 1000; // 8 hours
     this.maxLoginAttempts = 5;
     this.lockoutDuration = 30 * 60 * 1000; // 30 minutes
   }
 
-  // Admin login
-  async login(username, password) {
+  // Admin login — credentials are validated server-side; never stored in client bundle
+  async login(usernameOrEmail, password) {
     try {
-      // Input sanitization
-      username = SecurityUtils.sanitizeInput(username);
-      
-      // Rate limiting check
-      const rateLimit = SecurityUtils.rateLimit(`admin_login_${username}`, 5, 300000); // 5 attempts per 5 minutes
-      if (!rateLimit.allowed) {
-        throw new Error(`Too many login attempts. Try again in ${rateLimit.remainingTime} seconds.`);
+      const normalizedInput = usernameOrEmail?.trim().toLowerCase();
+
+      // Client-side rate limit as first guard (server also rate-limits)
+      const rateCheck = rateLimiter.checkLimit(normalizedInput, 'admin_login', 5, 300000);
+      if (!rateCheck.allowed) {
+        throw new Error(`Too many login attempts. Retry after ${rateCheck.retryAfter}s`);
       }
-      
-      // Check for account lockout
-      const lockoutInfo = this.getLoginAttempts(username);
+
+      const lockoutInfo = this.getLoginAttempts(normalizedInput);
       if (lockoutInfo.isLocked) {
         throw new Error(`Account locked. Try again in ${Math.ceil((lockoutInfo.lockoutEnd - Date.now()) / 60000)} minutes.`);
       }
 
-      // Verify credentials
-      if (username === this.adminCredentials.username && password === this.adminCredentials.password) {
-        // Clear login attempts on successful login
-        this.clearLoginAttempts(username);
-
-        // Generate admin session
-        const sessionToken = this.generateSecureToken();
-        const session = {
-          token: sessionToken,
-          username: this.adminCredentials.username,
-          email: this.adminCredentials.email,
-          role: this.adminCredentials.role,
-          permissions: this.adminCredentials.permissions,
-          subscriptionPlan: this.adminCredentials.subscriptionPlan,
-          isPremium: this.adminCredentials.isPremium,
-          features: this.adminCredentials.features,
-          loginTime: Date.now(),
-          expiresAt: Date.now() + this.sessionTimeout,
-          ipAddress: this.getCurrentIP(),
-          userAgent: navigator.userAgent,
-          user: {
-            id: 'admin_user',
-            name: 'System Administrator',
-            email: this.adminCredentials.email,
-            plan: 'business',
-            status: 'active'
-          }
-        };
-
-        // Store session
-        localStorage.setItem('nebula_admin_session', JSON.stringify(session));
-        sessionStorage.setItem('nebula_admin_token', sessionToken);
-
-        // Log admin login
-        this.logAdminActivity('LOGIN', { username, timestamp: Date.now() });
-
-        return {
-          success: true,
-          session,
-          message: 'Admin login successful'
-        };
-      } else {
-        // Record failed login attempt
-        this.recordFailedLogin(username);
-        throw new Error('Invalid admin credentials');
+      // Send credentials to the backend — never compare them client-side
+      let response;
+      try {
+        response = await fetch(`${this.backendUrl}/api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: usernameOrEmail?.trim(), password }),
+          signal: AbortSignal.timeout(10000),
+        });
+      } catch (networkErr) {
+        throw new Error(
+          'Cannot reach the admin backend. Start the local server with: node backend/dev-server.js'
+        );
       }
+
+      if (response.status === 429) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Too many login attempts');
+      }
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        this.recordFailedLogin(normalizedInput);
+        throw new Error(data.error || 'Invalid username/email or password');
+      }
+
+      const serverSession = await response.json();
+      this.clearLoginAttempts(normalizedInput);
+
+      const csrfToken = InputValidator.generateCSRFToken();
+      const session = {
+        token: serverSession.token,
+        csrfToken,
+        username: serverSession.username,
+        email: serverSession.email,
+        role: serverSession.role || 'super_admin',
+        permissions: ['all'],
+        subscriptionPlan: 'business',
+        isPremium: true,
+        features: {
+          unlimitedConversions: true,
+          prioritySupport: true,
+          advancedSettings: true,
+          batchProcessing: true,
+          apiAccess: true,
+          customBranding: true,
+          analytics: true,
+          multiUserAccess: true,
+          cloudStorage: 'unlimited',
+          retentionPeriod: 'unlimited',
+        },
+        loginTime: Date.now(),
+        expiresAt: serverSession.expiresAt,
+        ipAddress: this.getCurrentIP(),
+        userAgent: navigator.userAgent,
+        user: {
+          id: 'admin_user',
+          name: 'System Administrator',
+          email: serverSession.email,
+          plan: 'business',
+          status: 'active',
+        },
+      };
+
+      localStorage.setItem('nebula_admin_session', JSON.stringify(session));
+      sessionStorage.setItem('nebula_admin_token', serverSession.token);
+
+      this.logAdminActivity('LOGIN', { username: serverSession.username, timestamp: Date.now() });
+
+      return { success: true, session, message: 'Admin login successful' };
     } catch (error) {
-      this.logAdminActivity('LOGIN_FAILED', { 
-        username, 
-        error: error.message, 
-        timestamp: Date.now() 
+      this.logAdminActivity('LOGIN_FAILED', {
+        username: usernameOrEmail,
+        error: error.message,
+        timestamp: Date.now(),
       });
       throw error;
     }
@@ -147,10 +151,12 @@ class AdminAuthService {
   logout() {
     const session = this.getCurrentSession();
     if (session) {
-      this.logAdminActivity('LOGOUT', { 
-        username: session.username, 
-        timestamp: Date.now() 
-      });
+      this.logAdminActivity('LOGOUT', { username: session.username, timestamp: Date.now() });
+      // Fire-and-forget server-side session invalidation
+      fetch(`${this.backendUrl}/api/admin/logout`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.token}` },
+      }).catch(() => {}); // ignore network errors on logout
     }
 
     localStorage.removeItem('nebula_admin_session');
@@ -197,30 +203,37 @@ class AdminAuthService {
     };
   }
 
-  // Change admin password
+  // Change admin password via the backend server
   async changePassword(currentPassword, newPassword) {
     const session = this.getCurrentSession();
     if (!session) {
       throw new Error('Admin session required');
     }
 
-    if (currentPassword !== this.adminCredentials.password) {
-      throw new Error('Current password is incorrect');
+    if (newPassword.length < 12) {
+      throw new Error('New password must be at least 12 characters');
     }
 
-    if (newPassword.length < 8) {
-      throw new Error('New password must be at least 8 characters');
+    let response;
+    try {
+      response = await fetch(`${this.backendUrl}/api/admin/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+        signal: AbortSignal.timeout(10000),
+      });
+    } catch {
+      throw new Error('Cannot reach the admin backend. Password not changed.');
     }
 
-    // Update password (in production, this should update the database)
-    this.adminCredentials.password = newPassword;
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Password change failed');
 
-    this.logAdminActivity('PASSWORD_CHANGED', { 
-      username: session.username, 
-      timestamp: Date.now() 
-    });
-
-    return { success: true, message: 'Password changed successfully' };
+    this.logAdminActivity('PASSWORD_CHANGED', { username: session.username, timestamp: Date.now() });
+    return { success: true, message: data.message || 'Password changed successfully' };
   }
 
   // Track login attempts
@@ -350,8 +363,15 @@ class AdminAuthService {
       securityLevel: failedLogins < 5 ? 'HIGH' : failedLogins < 10 ? 'MEDIUM' : 'LOW'
     };
   }
+
 }
 
 // Create and export a singleton instance
 const adminAuthServiceInstance = new AdminAuthService();
+
+// Make it available globally for debugging
+if (typeof window !== 'undefined') {
+  window.adminAuthService = adminAuthServiceInstance;
+}
+
 export default adminAuthServiceInstance;

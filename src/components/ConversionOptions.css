@@ -1,28 +1,30 @@
 .conversion-options {
-  background: white;
+  background: var(--bg-primary);
   padding: 1.5rem;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
   margin: 20px 0;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .conversion-options h3 {
   margin-top: 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: clamp(1rem, 3vw, 1.2rem);
   word-wrap: break-word;
 }
 
 .file-info {
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   padding: 1rem;
   border-radius: 5px;
   margin: 15px 0;
+  transition: background 0.3s ease;
 }
 
 .file-info p {
   margin: 5px 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: clamp(0.8rem, 2.5vw, 0.9rem);
   word-wrap: break-word;
 }
@@ -35,28 +37,30 @@
   display: block;
   margin-bottom: 10px;
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
   font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 .format-selection select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
-  background: white;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   box-sizing: border-box;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .format-selection select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
 }
 
 .convert-btn {
-  background: #007bff;
+  background: var(--accent-color);
   color: white;
   border: none;
   padding: 12px 30px;
@@ -70,11 +74,11 @@
 }
 
 .convert-btn:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--accent-secondary);
 }
 
 .convert-btn:disabled {
-  background: #6c757d;
+  background: var(--text-muted);
   cursor: not-allowed;
 }
 

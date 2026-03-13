@@ -10,6 +10,18 @@
   align-items: center;
   z-index: 9999;
   animation: fadeIn 0.8s ease-in;
+  pointer-events: auto;
+}
+
+/* NUCLEAR OPTION: Force hidden to be completely gone */
+.splash-screen.hidden,
+.splash-screen[style*="display: none"] {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transform: translateY(-100vh) !important;
+  z-index: -1 !important;
 }
 
 .splash-content {
