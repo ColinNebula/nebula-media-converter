@@ -1,4 +1,5 @@
 // Platform detection and converter routing service
+import MediaConverter from '../utils/MediaConverter';
 class ConverterPlatformService {
   constructor() {
     this.platform = this.detectPlatform();
@@ -272,8 +273,6 @@ class CppBackendConverter {
 // WebAssembly Converter (existing FFmpeg.wasm)
 class WebAssemblyConverter {
   constructor() {
-    // Use existing MediaConverter from utils/MediaConverter.js
-    const MediaConverter = require('../utils/MediaConverter').default;
     this.converter = new MediaConverter();
   }
 
