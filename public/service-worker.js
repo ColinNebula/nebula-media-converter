@@ -2,15 +2,13 @@
 // Service Worker for Nebula Media Converter PWA
 // This service worker enables offline functionality and caching
 
-const CACHE_NAME = 'nebula-media-converter-v1';
-const RUNTIME_CACHE = 'nebula-runtime-v1';
+const CACHE_NAME = 'nebula-media-converter-v2';
+const RUNTIME_CACHE = 'nebula-runtime-v2';
 
-// Assets to cache on install
+// Assets to cache on install (Vite build uses /assets/ not /static/)
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/static/css/main.css',
-  '/static/js/main.js',
   '/manifest.json',
   '/favicon.ico',
   '/logo192.png',
