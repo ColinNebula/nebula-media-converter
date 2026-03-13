@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .test { margin: 10px 0; padding: 10px; border-radius: 8px; }
+        .pass { background: #1b4332; }
+        .fail { background: #7f1d1d; }
+        .warn { background: #78350f; }
+        h1 { color: #818cf8; }
+        code { background: #333; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Nebula Browser Compatibility Test</h1>
+    <div id="results"></div>
+    <h2>Actions</h2>
+    <button onclick="location.href='/'">Go to Main App</button>
+    <button onclick="location.href='/?nosw=1'">Go to App (No Service Worker)</button>
+    <button onclick="clearAll()">Clear All Cache & Reload</button>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(name, status, details = '') {
+            const div = document.createElement('div');
+            div.className = `test ${status}`;
+            div.innerHTML = `<strong>${status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⚠️'} ${name}</strong>${details ? `: ${details}` : ''}`;
+            results.appendChild(div);
+        }
+        
+        // Test 1: Basic JavaScript
+        addResult('JavaScript', 'pass', 'Working');
+        
+        // Test 2: ES6 Features
+        try {
+            const test = () => {};
+            const [a, b] = [1, 2];
+            const {x, y} = {x: 1, y: 2};
+            addResult('ES6 Features', 'pass', 'Arrow functions, destructuring OK');
+        } catch (e) {
+            addResult('ES6 Features', 'fail', e.message);
+        }
+        
+        // Test 3: Promises
+        try {
+            new Promise(r => r()).then(() => {});
+            addResult('Promises', 'pass');
+        } catch (e) {
+            addResult('Promises', 'fail', e.message);
+        }
+        
+        // Test 4: Async/Await
+        try {
+            eval('(async () => { await Promise.resolve(); })');
+            addResult('Async/Await', 'pass');
+        } catch (e) {
+            addResult('Async/Await', 'fail', e.message);
+        }
+        
+        // Test 5: Fetch API
+        if (typeof fetch === 'function') {
+            addResult('Fetch API', 'pass');
+        } else {
+            addResult('Fetch API', 'fail', 'Not available');
+        }
+        
+        // Test 6: Service Worker
+        if ('serviceWorker' in navigator) {
+            addResult('Service Worker API', 'pass');
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                addResult('Active Service Workers', 'pass', `${regs.length} registered`);
+            });
+        } else {
+            addResult('Service Worker API', 'warn', 'Not available');
+        }
+        
+        // Test 7: Cache API
+        if ('caches' in window) {
+            addResult('Cache API', 'pass');
+            caches.keys().then(keys => {
+                addResult('Cached Items', 'pass', `${keys.length} caches: ${keys.join(', ') || 'none'}`);
+            });
+        } else {
+            addResult('Cache API', 'warn', 'Not available');
+        }
+        
+        // Test 8: localStorage
+        try {
+            localStorage.setItem('test', '1');
+            localStorage.removeItem('test');
+            addResult('localStorage', 'pass');
+        } catch (e) {
+            addResult('localStorage', 'fail', e.message);
+        }
+        
+        // Test 9: WebAssembly
+        if (typeof WebAssembly === 'object') {
+            addResult('WebAssembly', 'pass');
+        } else {
+            addResult('WebAssembly', 'fail', 'Not available - FFmpeg won\'t work');
+        }
+        
+        // Test 10: SharedArrayBuffer
+        if (typeof SharedArrayBuffer !== 'undefined') {
+            addResult('SharedArrayBuffer', 'pass', 'Multi-threaded FFmpeg available');
+        } else {
+            addResult('SharedArrayBuffer', 'warn', 'Not available - FFmpeg will use single-threaded mode (this is OK)');
+        }
+        
+        // Test 11: Blob/File
+        if (typeof Blob === 'function' && typeof File === 'function') {
+            addResult('Blob/File API', 'pass');
+        } else {
+            addResult('Blob/File API', 'fail', 'File handling won\'t work');
+        }
+        
+        // Test 12: Web Crypto
+        if (window.crypto && window.crypto.subtle) {
+            addResult('Web Crypto API', 'pass');
+        } else {
+            addResult('Web Crypto API', 'warn', 'Password protection may not work');
+        }
+        
+        // Test 13: Dynamic Import
+        try {
+            eval('import("data:text/javascript,export default 1")');
+            addResult('Dynamic Import', 'pass');
+        } catch (e) {
+            addResult('Dynamic Import', 'warn', 'Lazy loading may not work');
+        }
+        
+        // Browser info
+        addResult('Browser', 'pass', navigator.userAgent);
+        addResult('URL', 'pass', location.href);
+        
+        // Clear function
+        async function clearAll() {
+            // Unregister service workers
+            if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                for (const reg of regs) {
+                    await reg.unregister();
+                }
+            }
+            
+            // Clear caches
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                for (const key of keys) {
+                    await caches.delete(key);
+                }
+            }
+            
+            // Clear storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            alert('All cleared! Reloading...');
+            location.reload(true);
+        }
+    </script>
+</body>
+</html>

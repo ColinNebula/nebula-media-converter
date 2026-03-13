@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Worker Cleanup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #e74c3c; }
+    h2 { color: #3498db; margin-top: 30px; }
+    .step {
+      background: #ecf0f1;
+      padding: 15px;
+      margin: 10px 0;
+      border-left: 4px solid #3498db;
+      border-radius: 4px;
+    }
+    .warning {
+      background: #fff3cd;
+      border-left-color: #ffc107;
+      color: #856404;
+    }
+    .success {
+      background: #d4edda;
+      border-left-color: #28a745;
+      color: #155724;
+    }
+    button {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 20px 0;
+    }
+    button:hover {
+      background: #c0392b;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚨 Service Worker Cleanup Required</h1>
+    
+    <div class="step warning">
+      <strong>⚠️ Your app won't load because of a broken service worker.</strong>
+      <p>This is preventing React from rendering. Follow the steps below to fix it.</p>
+    </div>
+
+    <h2>🔧 Automatic Fix (Try This First)</h2>
+    
+    <div id="status" class="status" style="display:none;"></div>
+    
+    <button onclick="unregisterAllServiceWorkers()">
+      🗑️ Click Here to Unregister Service Workers
+    </button>
+    
+    <div id="result"></div>
+
+    <h2>📋 Manual Steps (If automatic doesn't work)</h2>
+    
+    <div class="step">
+      <strong>Step 1: Open DevTools</strong>
+      <ul>
+        <li>Press <kbd>F12</kbd> on your keyboard</li>
+        <li>Or right-click and select "Inspect"</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <strong>Step 2: Go to Application Tab</strong>
+      <ul>
+        <li>Click the "Application" tab (Chrome/Edge)</li>
+        <li>Or "Storage" tab (Firefox)</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <strong>Step 3: Unregister Service Workers</strong>
+      <ul>
+        <li>Click "Service Workers" in the left sidebar</li>
+        <li>Click "Unregister" for each service worker</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <strong>Step 4: Clear Site Data</strong>
+      <ul>
+        <li>Click "Storage" in the left sidebar</li>
+        <li>Click "Clear site data" button</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <strong>Step 5: Clear Browser Cache</strong>
+      <ul>
+        <li>Press <kbd>Ctrl + Shift + Del</kbd></li>
+        <li>Select "Cached images and files"</li>
+        <li>Select "Cookies and other site data"</li>
+        <li>Click "Clear data"</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <strong>Step 6: Restart Browser</strong>
+      <ul>
+        <li>Close ALL browser tabs for localhost:3000</li>
+        <li>Restart your browser completely</li>
+        <li>Go back to <a href="http://localhost:3000">http://localhost:3000</a></li>
+      </ul>
+    </div>
+
+    <div class="step success">
+      <strong>✅ After completing these steps:</strong>
+      <p>Your app will load correctly and future service workers will be automatically prevented.</p>
+    </div>
+  </div>
+
+  <script>
+    function unregisterAllServiceWorkers() {
+      const statusDiv = document.getElementById('status');
+      const resultDiv = document.getElementById('result');
+      
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = '#fff3cd';
+      statusDiv.style.color = '#856404';
+      statusDiv.textContent = '⏳ Unregistering service workers...';
+      resultDiv.innerHTML = '';
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          if (registrations.length === 0) {
+            statusDiv.style.background = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.textContent = '✅ No service workers found! You\'re all set.';
+            resultDiv.innerHTML = '<p><strong>Next:</strong> Go to <a href="http://localhost:3000">http://localhost:3000</a></p>';
+            return;
+          }
+
+          let unregistered = 0;
+          statusDiv.textContent = `🗑️ Found ${registrations.length} service worker(s). Removing...`;
+
+          Promise.all(registrations.map(reg => reg.unregister()))
+            .then(() => {
+              statusDiv.style.background = '#d4edda';
+              statusDiv.style.color = '#155724';
+              statusDiv.textContent = `✅ Successfully unregistered ${registrations.length} service worker(s)!`;
+              resultDiv.innerHTML = `
+                <div class="step success">
+                  <strong>✅ Success! Now:</strong>
+                  <ol>
+                    <li>Close this tab</li>
+                    <li>Clear browser cache (Ctrl+Shift+Del)</li>
+                    <li>Restart your browser</li>
+                    <li>Go to <a href="http://localhost:3000">http://localhost:3000</a></li>
+                  </ol>
+                </div>
+              `;
+            })
+            .catch(err => {
+              statusDiv.style.background = '#f8d7da';
+              statusDiv.style.color = '#721c24';
+              statusDiv.textContent = '❌ Error: ' + err.message;
+              resultDiv.innerHTML = '<p><strong>Please follow the manual steps below.</strong></p>';
+            });
+        });
+      } else {
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = '#f8d7da';
+        statusDiv.style.color = '#721c24';
+        statusDiv.textContent = '❌ Service workers not supported in this browser';
+      }
+    }
+
+    // Auto-run on page load
+    window.addEventListener('load', function() {
+      setTimeout(unregisterAllServiceWorkers, 1000);
+    });
+  </script>
+</body>
+</html>

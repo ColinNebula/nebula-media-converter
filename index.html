@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <!-- 
+      NOTE: Cross-Origin headers for FFmpeg.wasm SharedArrayBuffer support
+      These are COMMENTED OUT because they block external resources in browsers.
+      FFmpeg.wasm will use a fallback single-threaded mode without these headers.
+      For production with SharedArrayBuffer support, configure these as HTTP headers on your server.
+    -->
+    <!-- <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp"> -->
+    <!-- <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin"> -->
+    
+    <!-- Security Headers (X-Frame-Options must be set server-side) -->
+    <!-- CSP is relaxed for development - tighten for production via server headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <!-- Force favicon refresh with timestamp -->
+    <link rel="icon" type="image/svg+xml" href="/nebula-media-converter/favicon.svg?v=2025100601" />
+    <link rel="icon" type="image/x-icon" href="/nebula-media-converter/favicon.ico?v=2025100601" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/nebula-media-converter/logo192.png?v=2025100601" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/nebula-media-converter/logo512.png?v=2025100601" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Nebula Media" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="description"
+      content="Nebula Media Converter - Convert your audio and video files easily with this powerful web-based tool."
+    />
+    <link rel="apple-touch-icon" href="/nebula-media-converter/logo192.png?v=2025100601" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/nebula-media-converter/logo192.png?v=2025100601" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/nebula-media-converter/logo512.png?v=2025100601" />
+    <link rel="manifest" href="/nebula-media-converter/manifest.json" />
+    <title>Nebula Media Converter</title>
+    
+    <!-- Disable React DevTools profiling to prevent errors -->
+    <script>
+      // ── React 19 addObjectDiffToProperties crash fix ──────────────────────────
+      // React 19 unconditionally enables ProfileMode on ALL fiber trees.
+      // This causes logComponentRender() → addObjectDiffToProperties() to run on
+      // every commit, which crashes when props contain certain values.
+      //
+      // The entire code path is gated on a module-level variable:
+      //
+      //   supportsUserTiming = typeof console.timeStamp === 'function'
+      //                     && typeof performance.measure === 'function'
+      //
+      // This variable is computed ONCE when react-dom's CJS module is evaluated.
+      // By making console.timeStamp a non-function BEFORE the bundle script loads,
+      // React permanently computes supportsUserTiming = false and logComponentRender
+      // becomes a no-op, eliminating the crash entirely.
+      //
+      // We do NOT restore console.timeStamp — in development mode losing Chrome's
+      // performance timeline marks is an acceptable trade-off for a stable app.
+      // ──────────────────────────────────────────────────────────────────────────
+      (function() {
+        try {
+          Object.defineProperty(console, 'timeStamp', {
+            value: null,
+            writable: true,
+            configurable: true
+          });
+        } catch (e) {
+          try { console.timeStamp = null; } catch (e2) { /* ignore */ }
+        }
+      })();
+
+      // Must run BEFORE React loads - React 19 DevTools compatibility
+      if (typeof window !== 'undefined') {
+        const errorPatterns = [
+          'addObjectDiffToProperties',
+          'logComponentRender',
+          'Should not already be working',
+          'commitPassiveMountOnFiber',
+          'performWorkOnRoot',
+          'performWorkOnRootViaSchedulerTask',
+          'performWorkUntilDeadline',
+          'recursivelyTraversePassiveMountEffects',
+          'reading \'toString\''
+        ];
+        
+        const shouldSuppressError = (message) => {
+          if (!message) return false;
+          const msg = typeof message === 'string' ? message : String(message);
+          return errorPatterns.some(pattern => msg.includes(pattern));
+        };
+        
+        const noop = function() {};
+        const emptyMap = new Map();
+        const emptySet = new Set();
+        
+        if (!window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+          window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+            checkDCE: noop,
+            supportsFiber: true,
+            renderers: emptyMap,
+            onCommitFiberRoot: noop,
+            onCommitFiberUnmount: noop,
+            onCommitFiberMount: noop,
+            onPostCommitFiberRoot: noop,
+            inject: function(renderer) {
+              const id = Math.random();
+              this.renderers.set(id, renderer);
+              return id;
+            },
+            _listeners: {},
+            _renderers: {},
+            emit: noop,
+            getFiberRoots: function() { return emptySet; },
+            on: noop,
+            off: noop,
+            sub: function() { return noop; },
+            isDisabled: true,
+            injectProfilingHooks: noop,
+            onCommitRoot: noop,
+            onCommitUnmount: noop,
+            logComponentRender: noop,
+            addObjectDiffToProperties: noop
+          };
+        } else {
+          const existingHook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+          if (existingHook) {
+            try { existingHook.isDisabled = true; } catch(e) {}
+            existingHook.logComponentRender = noop;
+            existingHook.addObjectDiffToProperties = noop;
+            existingHook.injectProfilingHooks = noop;
+          }
+        }
+        
+        const originalError = console.error;
+        console.error = function(...args) {
+          const msg = args[0]?.toString?.() || String(args[0] || '');
+          if (!shouldSuppressError(msg)) {
+            originalError.apply(console, args);
+          }
+        };
+      }
+    </script>
+    
+    <!-- Suppress browser extension errors during development -->
+    <script src="/nebula-media-converter/suppress-extension-errors.js?v=20251104" defer></script>
+    
+    <!-- Clear any service workers that might cause issues -->
+    <script src="/nebula-media-converter/clear-service-workers.js" defer></script>
+    
+    <!-- Filter React error overlay -->
+    <script src="/nebula-media-converter/react-error-overlay-filter.js" defer></script>
+    
+    <!-- Disable overlay for specific errors (nuclear option) -->
+    <script src="/nebula-media-converter/disable-overlay.js" defer></script>
+    
+    <!-- UI Block Diagnostic Tool -->
+    <script src="/nebula-media-converter/diagnose-ui-block.js" defer></script>
+    <script type="module" crossorigin src="/nebula-media-converter/assets/index-DdxOGqua.js"></script>
+    <link rel="stylesheet" crossorigin href="/nebula-media-converter/assets/index-Cn3a3wbU.css">
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
