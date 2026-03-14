@@ -59,7 +59,7 @@
     "desktop:build": "npm run build && electron-builder",
     "install": "echo Skipping native addon build - will use FFmpeg.wasm fallback",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build --dotfiles --no-history"
+    "deploy": "gh-pages -d build --dotfiles"
   },
   "overrides": {
     "nth-check": "^2.1.1",
