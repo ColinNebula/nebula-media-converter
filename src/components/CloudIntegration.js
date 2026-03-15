@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './CloudIntegration.css';
 
 // Google Drive API configuration
@@ -32,45 +32,69 @@ const CloudIntegration = ({
   const [isUploading, setIsUploading] = useState(false);
   const [mode, setMode] = useState('import'); // 'import' or 'save'
 
-  // Initialize Google API
-  useEffect(() => {
-    const loadGoogleAPI = () => {
-      if (!window.gapi) {
-        const script = document.createElement('script');
-        script.src = 'https://apis.google.com/js/api.js';
-        script.onload = () => initGoogleAPI();
-        document.body.appendChild(script);
-      } else {
-        initGoogleAPI();
-      }
-    };
+  const googleAccessTokenRef = useRef(null);
+  const tokenClientRef = useRef(null);
 
-    const initGoogleAPI = () => {
-      window.gapi.load('client:auth2', async () => {
+  // Initialize Google API (gapi for Drive client + GIS for OAuth)
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !GOOGLE_API_KEY) return;
+
+    const initGapiClient = () => {
+      window.gapi.load('client', async () => {
         try {
           await window.gapi.client.init({
             apiKey: GOOGLE_API_KEY,
-            clientId: GOOGLE_CLIENT_ID,
-            scope: GOOGLE_SCOPES,
             discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
           });
-          
-          const authInstance = window.gapi.auth2.getAuthInstance();
-          const isSignedIn = authInstance.isSignedIn.get();
-          setIsAuthenticated(prev => ({ ...prev, google: isSignedIn }));
-          
-          authInstance.isSignedIn.listen((signedIn) => {
-            setIsAuthenticated(prev => ({ ...prev, google: signedIn }));
-          });
         } catch (err) {
-          console.error('Google API initialization error:', err);
+          console.error('Google API client init error:', err);
         }
       });
     };
 
-    if (GOOGLE_CLIENT_ID && GOOGLE_API_KEY) {
-      loadGoogleAPI();
-    }
+    const initGIS = () => {
+      tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_SCOPES,
+        callback: (response) => {
+          if (response.error) {
+            setError('Google authentication failed: ' + response.error);
+            return;
+          }
+          googleAccessTokenRef.current = response.access_token;
+          window.gapi.client.setToken({ access_token: response.access_token });
+          setIsAuthenticated(prev => ({ ...prev, google: true }));
+        }
+      });
+    };
+
+    const loadScripts = () => {
+      const gapiLoaded = !!window.gapi;
+      const gisLoaded = !!(window.google && window.google.accounts);
+
+      if (!gapiLoaded) {
+        const gapiScript = document.createElement('script');
+        gapiScript.src = 'https://apis.google.com/js/api.js';
+        gapiScript.onload = () => {
+          initGapiClient();
+          if (window.google && window.google.accounts) initGIS();
+        };
+        document.body.appendChild(gapiScript);
+      } else {
+        initGapiClient();
+      }
+
+      if (!gisLoaded) {
+        const gisScript = document.createElement('script');
+        gisScript.src = 'https://accounts.google.com/gsi/client';
+        gisScript.onload = () => initGIS();
+        document.body.appendChild(gisScript);
+      } else {
+        initGIS();
+      }
+    };
+
+    loadScripts();
   }, []);
 
   // Initialize Dropbox
@@ -85,17 +109,22 @@ const CloudIntegration = ({
   }, []);
 
   // Google Drive Authentication
-  const handleGoogleAuth = async () => {
-    try {
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      if (isAuthenticated.google) {
-        await authInstance.signOut();
-      } else {
-        await authInstance.signIn();
-        await loadGoogleDriveFiles();
+  const handleGoogleAuth = () => {
+    if (isAuthenticated.google) {
+      // Sign out: revoke token and clear state
+      if (googleAccessTokenRef.current) {
+        window.google?.accounts.oauth2.revoke(googleAccessTokenRef.current, () => {});
+        googleAccessTokenRef.current = null;
       }
-    } catch (err) {
-      setError('Google authentication failed: ' + err.message);
+      window.gapi?.client.setToken(null);
+      setIsAuthenticated(prev => ({ ...prev, google: false }));
+      setFiles([]);
+    } else {
+      if (!tokenClientRef.current) {
+        setError('Google API not initialized. Check your Client ID and API Key.');
+        return;
+      }
+      tokenClientRef.current.requestAccessToken({ prompt: '' });
     }
   };
 
@@ -251,18 +280,23 @@ const CloudIntegration = ({
   };
 
   // Download file from Google Drive
+  // Uses fetch directly so binary data is not corrupted by the GAPI JS client
   const downloadGoogleDriveFile = async (file) => {
-    try {
-      const response = await window.gapi.client.drive.files.get({
-        fileId: file.id,
-        alt: 'media'
-      });
-      
-      const blob = new Blob([response.body], { type: file.mimeType });
-      return new File([blob], file.name, { type: file.mimeType });
-    } catch (err) {
-      throw new Error('Failed to download file from Google Drive');
+    const token = googleAccessTokenRef.current;
+    if (!token) throw new Error('Not authenticated with Google Drive');
+
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!response.ok) {
+      const msg = await response.text().catch(() => response.statusText);
+      throw new Error(`Failed to download from Google Drive: ${msg}`);
     }
+
+    const blob = await response.blob();
+    return new File([blob], file.name, { type: file.mimeType || blob.type });
   };
 
   // Download file from Dropbox
@@ -328,8 +362,9 @@ const CloudIntegration = ({
     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
     form.append('file', file);
     
-    const token = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-    
+    const token = googleAccessTokenRef.current;
+    if (!token) throw new Error('Not authenticated with Google Drive');
+
     const xhr = new XMLHttpRequest();
     
     return new Promise((resolve, reject) => {

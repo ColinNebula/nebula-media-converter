@@ -25,9 +25,8 @@ export default defineConfig(({ mode }) => {
       {
         name: 'treat-js-as-jsx',
         enforce: 'pre',
-        apply: 'build',
         async transform(code, id) {
-          if (!id.match(/\/src\/.*\.js$/) || id.includes('node_modules')) return null;
+          if (!id.match(/[/\\]src[/\\].*\.js$/) || id.includes('node_modules')) return null;
           return transformWithEsbuild(code, id, {
             loader: 'jsx',
             jsx: 'automatic',
@@ -58,6 +57,14 @@ export default defineConfig(({ mode }) => {
       headers: {
         'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
+      },
+    },
+
+    optimizeDeps: {
+      esbuildOptions: {
+        loader: {
+          '.js': 'jsx',
+        },
       },
     },
   };
