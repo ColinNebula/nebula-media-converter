@@ -1,8 +1,0 @@
-import{Vector3 as u}from"./three.module-ByEr90b5.js";class X{parse(M,x={}){x=Object.assign({binary:!1},x);const f=x.binary,y=[];let d=0;M.traverse(function(t){if(t.isMesh){const r=t.geometry,i=r.index,a=r.getAttribute("position");d+=i!==null?i.count/3:a.count/3,y.push({object3d:t,geometry:r})}});let e,n=80;if(f===!0){const t=d*2+d*3*4*4+80+4,r=new ArrayBuffer(t);e=new DataView(r),e.setUint32(n,d,!0),n+=4}else e="",e+=`solid exported
-`;const c=new u,p=new u,m=new u,g=new u,z=new u,l=new u;for(let t=0,r=y.length;t<r;t++){const i=y[t].object3d,a=y[t].geometry,o=a.index,b=a.getAttribute("position");if(o!==null)for(let s=0;s<o.count;s+=3){const B=o.getX(s+0),A=o.getX(s+1),F=o.getX(s+2);h(B,A,F,b,i)}else for(let s=0;s<b.count;s+=3){const B=s+0,A=s+1,F=s+2;h(B,A,F,b,i)}}return f===!1&&(e+=`endsolid exported
-`),e;function h(t,r,i,a,o){c.fromBufferAttribute(a,t),p.fromBufferAttribute(a,r),m.fromBufferAttribute(a,i),o.isSkinnedMesh===!0&&(o.applyBoneTransform(t,c),o.applyBoneTransform(r,p),o.applyBoneTransform(i,m)),c.applyMatrix4(o.matrixWorld),p.applyMatrix4(o.matrixWorld),m.applyMatrix4(o.matrixWorld),V(c,p,m),w(c),w(p),w(m),f===!0?(e.setUint16(n,0,!0),n+=2):(e+=`		endloop
-`,e+=`	endfacet
-`)}function V(t,r,i){g.subVectors(i,r),z.subVectors(t,r),g.cross(z).normalize(),l.copy(g).normalize(),f===!0?(e.setFloat32(n,l.x,!0),n+=4,e.setFloat32(n,l.y,!0),n+=4,e.setFloat32(n,l.z,!0),n+=4):(e+="	facet normal "+l.x+" "+l.y+" "+l.z+`
-`,e+=`		outer loop
-`)}function w(t){f===!0?(e.setFloat32(n,t.x,!0),n+=4,e.setFloat32(n,t.y,!0),n+=4,e.setFloat32(n,t.z,!0),n+=4):e+="			vertex "+t.x+" "+t.y+" "+t.z+`
-`}}}export{X as STLExporter};
