@@ -38,6 +38,10 @@
   },
   "main": "public/electron.js",
   "homepage": "https://ColinNebula.github.io/nebula-media-converter",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "start": "vite",
     "build": "vite build",
@@ -50,7 +54,6 @@
     "security:check": "npm run security:audit && echo Security check passed",
     "prepare:github": "powershell -ExecutionPolicy Bypass -File ./scripts/prepare-for-github.ps1",
     "prepare:github:unix": "bash ./scripts/prepare-for-github.sh",
-    "prebuild": "npm run security:audit",
     "electron:dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron:build": "npm run build && electron-builder",
     "addon:build": "cmake-js compile",

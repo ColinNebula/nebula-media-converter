@@ -122,7 +122,7 @@ Add these to your README.md:
 ## Troubleshooting
 
 ### Build Failures
-- Check Node.js version matches (currently v20)
+- Check Node.js version matches (currently v22 LTS)
 - Verify all dependencies install correctly
 - Review build logs in Actions tab
 

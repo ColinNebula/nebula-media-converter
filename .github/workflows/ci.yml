@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 jobs:
   lint:
@@ -120,20 +120,3 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
-        cname: nebula-media-converter.app # Optional: add your custom domain
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Download build artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: build
-        path: build/
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build
-        cname: yourdomain.com  # Remove or change this
