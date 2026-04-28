@@ -44,6 +44,44 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'build',
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // React core
+            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+              return 'react';
+            }
+            // Three.js (3D) — very large
+            if (id.includes('node_modules/three/')) {
+              return 'three';
+            }
+            // PDF.js — large viewer + worker
+            if (id.includes('node_modules/pdfjs-dist/')) {
+              return 'pdfjs';
+            }
+            // Tesseract OCR — large wasm bundle
+            if (id.includes('node_modules/tesseract.js/')) {
+              return 'tesseract';
+            }
+            // PDF authoring library
+            if (id.includes('node_modules/pdf-lib/')) {
+              return 'pdf-lib';
+            }
+            // Word document parser
+            if (id.includes('node_modules/mammoth/')) {
+              return 'mammoth';
+            }
+            // FFmpeg
+            if (id.includes('node_modules/@ffmpeg/')) {
+              return 'ffmpeg';
+            }
+            // Remaining vendor libs
+            if (id.includes('node_modules/')) {
+              return 'vendor';
+            }
+          },
+        },
+      },
     },
 
     // Serve public/ assets (suppress-extension-errors.js etc.)

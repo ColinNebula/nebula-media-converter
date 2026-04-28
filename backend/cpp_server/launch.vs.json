@@ -1,0 +1,26 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "nebula_server.exe",
+      "name": "Nebula Server (Debug)",
+      "args": [],
+      "env": {
+        "PORT": "8080"
+      }
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "nebula_server.exe",
+      "name": "Nebula Server (Release)",
+      "args": [],
+      "env": {
+        "PORT": "8080"
+      }
+    }
+  ]
+}

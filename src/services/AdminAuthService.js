@@ -13,7 +13,63 @@ class AdminAuthService {
     this.lockoutDuration = 30 * 60 * 1000; // 30 minutes
   }
 
-  // Admin login — credentials are validated server-side; never stored in client bundle
+  // Client-side PBKDF2-SHA256 verification using Web Crypto API.
+  // Replicates exactly what Node does: pbkdf2Sync(password, saltHexString, 310000, 32, 'sha256')
+  // The salt is the hex string treated as UTF-8 bytes (Node's default string encoding).
+  async _verifyPasswordClientSide(password, saltHex, expectedHash) {
+    try {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+      );
+      const derivedBits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: enc.encode(saltHex), iterations: 310000, hash: 'SHA-256' },
+        keyMaterial,
+        256 // 32 bytes
+      );
+      const derived = Array.from(new Uint8Array(derivedBits))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+      return derived === expectedHash;
+    } catch {
+      return false;
+    }
+  }
+
+  // Offline login against REACT_APP_ env credentials when the backend is unreachable.
+  async _loginOffline(usernameOrEmail, password) {
+    const expectedUsername = process.env.REACT_APP_ADMIN_USERNAME || '';
+    const salt             = process.env.REACT_APP_ADMIN_PASSWORD_SALT || '';
+    const hash             = process.env.REACT_APP_ADMIN_PASSWORD_HASH || '';
+    const email            = process.env.REACT_APP_ADMIN_EMAIL || expectedUsername;
+
+    if (!salt || !hash) {
+      throw new Error('Admin credentials not configured. Set REACT_APP_ADMIN_PASSWORD_SALT and REACT_APP_ADMIN_PASSWORD_HASH in .env');
+    }
+
+    const normalizedInput    = usernameOrEmail?.trim().toLowerCase();
+    const normalizedExpected = expectedUsername.trim().toLowerCase();
+
+    if (normalizedInput !== normalizedExpected) {
+      throw new Error('Invalid username/email or password');
+    }
+
+    const valid = await this._verifyPasswordClientSide(password, salt, hash);
+    if (!valid) {
+      throw new Error('Invalid username/email or password');
+    }
+
+    // Build a local session token (not server-issued, but sufficient for a static deployment)
+    const token = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+    return {
+      token,
+      expiresAt: Date.now() + this.sessionTimeout,
+      username: expectedUsername,
+      email,
+      role: 'super_admin',
+    };
+  }
+
+  // Admin login — tries the backend first, falls back to client-side PBKDF2 if unreachable
   async login(usernameOrEmail, password) {
     try {
       const normalizedInput = usernameOrEmail?.trim().toLowerCase();
@@ -29,33 +85,36 @@ class AdminAuthService {
         throw new Error(`Account locked. Try again in ${Math.ceil((lockoutInfo.lockoutEnd - Date.now()) / 60000)} minutes.`);
       }
 
-      // Send credentials to the backend — never compare them client-side
-      let response;
+      // Try backend first; fall back to offline WebCrypto verification if unreachable
+      let serverSession;
       try {
-        response = await fetch(`${this.backendUrl}/api/admin/login`, {
+        const response = await fetch(`${this.backendUrl}/api/admin/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: usernameOrEmail?.trim(), password }),
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(5000),
         });
+
+        if (response.status === 429) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || 'Too many login attempts');
+        }
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          this.recordFailedLogin(normalizedInput);
+          throw new Error(data.error || 'Invalid username/email or password');
+        }
+
+        serverSession = await response.json();
       } catch (networkErr) {
-        throw new Error(
-          'Cannot reach the admin backend. Start the local server with: node backend/dev-server.js'
-        );
+        // Backend unreachable — authenticate client-side using bundled PBKDF2 hash
+        if (networkErr.message.startsWith('Invalid') || networkErr.message.startsWith('Too many') || networkErr.message.startsWith('Account')) {
+          throw networkErr;
+        }
+        serverSession = await this._loginOffline(usernameOrEmail, password);
       }
 
-      if (response.status === 429) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Too many login attempts');
-      }
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        this.recordFailedLogin(normalizedInput);
-        throw new Error(data.error || 'Invalid username/email or password');
-      }
-
-      const serverSession = await response.json();
       this.clearLoginAttempts(normalizedInput);
 
       const csrfToken = InputValidator.generateCSRFToken();

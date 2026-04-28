@@ -149,5 +149,4 @@
   
   // Silent initialization message
   // console.log('💡 UI diagnostic available: call window.diagnoseUI() in console');
-  
 })();

@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import './styles/dark-theme.css';
@@ -8,6 +7,21 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './components/Toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  </React.StrictMode>
+);
 
 // Suppress React DevTools and extension errors (temporarily disabled for debugging)
 if (typeof window !== 'undefined') {
@@ -35,51 +49,10 @@ if (typeof window !== 'undefined') {
   }
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-
-// Add error boundary at the top level
-try {
-  root.render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <ThemeProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </ThemeProvider>
-      </ErrorBoundary>
-    </React.StrictMode>
-  );
-} catch (error) {
-  console.error('Error rendering app:', error);
-  // Fallback rendering
-  root.render(
-    <div style={{padding: '20px', fontFamily: 'Arial'}}>
-      <h1>Error Loading App</h1>
-      <p>Please check the console for details.</p>
-      <pre>{error.toString()}</pre>
-    </div>
-  );
-}
-
-// Register PWA service worker for offline support
-// Disable in development if causing issues - add ?nosw=1 to URL
-const urlParams = new URLSearchParams(window.location.search);
-const disableSW =
-  process.env.NODE_ENV !== 'production' || // never run in dev — SW caches stale bundles
-  urlParams.get('nosw') === '1' ||
-  process.env.REACT_APP_DISABLE_SW === 'true';
-
-if (disableSW) {
-  serviceWorkerRegistration.unregister();
-} else {
-  serviceWorkerRegistration.register({
-    onSuccess: (registration) => {
-      // PWA ready
-    },
-    onUpdate: (registration) => {
-      // New version available
-      if (registration && registration.waiting) {
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
       }
     }

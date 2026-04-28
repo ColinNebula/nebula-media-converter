@@ -440,6 +440,8 @@ html[data-theme="dark"] body,
   filter: brightness(1.1);
 }
 
+
+
 .admin-shortcut-hint {
   margin-top: 0.5rem;
   font-size: 0.75rem;
