@@ -6,9 +6,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   // Build a define map for process.env.* compatibility with CRA-style REACT_APP_ vars
+  const isAzure = process.env.DEPLOY_TARGET === 'azure';
   const processEnvDefines = {
     'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development'),
-    'process.env.PUBLIC_URL': JSON.stringify(mode === 'production' ? '/nebula-media-converter' : ''),
+    'process.env.PUBLIC_URL': JSON.stringify(isAzure ? '' : (mode === 'production' ? '/nebula-media-converter' : '')),
   };
   // Map every REACT_APP_ variable from .env files
   for (const [key, val] of Object.entries(env)) {
@@ -37,8 +38,8 @@ export default defineConfig(({ mode }) => {
       react(),
     ],
 
-    // Base path for GitHub Pages deployment at /nebula-media-converter/
-    base: mode === 'production' ? '/nebula-media-converter/' : '/',
+    // Base path: root for Azure, /nebula-media-converter/ for GitHub Pages
+    base: isAzure ? '/' : (mode === 'production' ? '/nebula-media-converter/' : '/'),
 
     // Output to build/ so existing gh-pages deploy script works unchanged
     build: {

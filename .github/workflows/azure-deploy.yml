@@ -9,6 +9,7 @@ env:
   NODE_VERSION: '20.x'
   AZURE_WEBAPP_NAME: nebula-media-converter-hadygqenh6dpe9c5
   AZURE_WEBAPP_PACKAGE_PATH: './build'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-deploy:
