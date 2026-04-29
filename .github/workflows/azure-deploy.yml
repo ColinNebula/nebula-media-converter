@@ -42,17 +42,26 @@ jobs:
         GENERATE_SOURCEMAP: false
         DEPLOY_TARGET: azure
 
-    - name: Copy Azure configuration
+    - name: Copy Azure configuration and server files
       run: |
         cp web.config build/web.config
-        echo "Files in build directory:"
+        cp server.js build/server.js
+        cp azure-package.json build/package.json
+        echo "Files prepared for Azure deployment:"
         ls -la build/
         echo "Total files:"
         find build -type f | wc -l
 
+    - namd build
+        zip -r ../deployment.zip . -x "*.git*"ed"
+        ls -la node_modules/ | head -20
+
     - name: Create deployment package
       run: |
+        cp server.js build/
+        cp azure-package.json build/package.json
         cd build
+        npm install --production
         zip -r ../deployment.zip .
         cd ..
         echo "Deployment package created"
