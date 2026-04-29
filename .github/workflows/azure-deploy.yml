@@ -44,22 +44,33 @@ jobs:
 
     - name: Copy Azure configuration
       run: |
-        cp web.config build/
-        echo "Web.config copied to build directory"
+        cp web.config build/web.config
+        echo "Files in build directory:"
         ls -la build/
+        echo "Total files:"
+        find build -type f | wc -l
 
-    - name: Upload artifact for deployment
-      uses: actions/upload-artifact@v4
-      with:
-        name: node-app
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Create deployment package
+      run: |
+        cd build
+        zip -r ../deployment.zip .
+        cd ..
+        echo "Deployment package created"
+        ls -lh deployment.zip
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        package: deployment.zip
+
+    - name: Upload deployment artifact (for debugging)
+      uses: actions/upload-artifact@v4
+      with:
+        name: azure-deployment-package
+        path: deployment.zip
+        retention-days: 1
 
     - name: Deployment notification
       if: success()
@@ -72,8 +83,8 @@ jobs:
     needs: build-and-deploy
     
     steps:
-    - name: Wait for deployment
-      run: sleep 30
+    - name: Wait for deployment to propagate
+      run: sleep 60
 
     - name: Health check
       run: |
