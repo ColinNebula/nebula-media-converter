@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '20.x'
+  NODE_OPTIONS: '--max-old-space-size=4096'
 
 jobs:
   build-electron:

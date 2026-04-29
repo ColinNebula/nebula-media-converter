@@ -39,8 +39,8 @@
   "main": "public/electron.js",
   "homepage": "https://ColinNebula.github.io/nebula-media-converter",
   "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=10.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "scripts": {
     "start": "vite",
